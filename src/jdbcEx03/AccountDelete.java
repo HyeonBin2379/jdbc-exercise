@@ -1,4 +1,4 @@
-package jdbcEX03;
+package jdbcEx03;
 
 import util.DBUtil;
 
