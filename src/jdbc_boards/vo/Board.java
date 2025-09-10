@@ -8,19 +8,19 @@ import java.util.Date;
 public class Board {
 
     private int bno;
-    private String bTitle;
-    private String bContent;
-    private String bWriter;
-    private Date bDate;
+    private String btitle;
+    private String bcontent;
+    private String bwriter;
+    private Date bdate;
 
     public Board() {}
 
     public Board(int bno, String bTitle, String bContent, String bWriter, Date bDate) {
         this.bno = bno;
-        this.bTitle = bTitle;
-        this.bContent = bContent;
-        this.bWriter = bWriter;
-        this.bDate = bDate;
+        this.btitle = bTitle;
+        this.bcontent = bContent;
+        this.bwriter = bWriter;
+        this.bdate = bDate;
     }
 
     public int getBno() {
@@ -31,36 +31,36 @@ public class Board {
         this.bno = bno;
     }
 
-    public String getbTitle() {
-        return bTitle;
+    public String getBtitle() {
+        return btitle;
     }
 
-    public void setbTitle(String bTitle) {
-        this.bTitle = bTitle;
+    public void setBtitle(String btitle) {
+        this.btitle = btitle;
     }
 
-    public String getbContent() {
-        return bContent;
+    public String getBcontent() {
+        return bcontent;
     }
 
-    public void setbContent(String bContent) {
-        this.bContent = bContent;
+    public void setBcontent(String bcontent) {
+        this.bcontent = bcontent;
     }
 
-    public String getbWriter() {
-        return bWriter;
+    public String getBwriter() {
+        return bwriter;
     }
 
-    public void setbWriter(String bWriter) {
-        this.bWriter = bWriter;
+    public void setBwriter(String bwriter) {
+        this.bwriter = bwriter;
     }
 
-    public Date getbDate() {
-        return bDate;
+    public Date getBdate() {
+        return bdate;
     }
 
-    public void setbDate(Date bDate) {
-        this.bDate = bDate;
+    public void setBdate(Date bdate) {
+        this.bdate = bdate;
     }
 
     @Override
