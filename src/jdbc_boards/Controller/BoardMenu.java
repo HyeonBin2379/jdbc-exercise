@@ -36,11 +36,11 @@ public class BoardMenu {
             case 1:
                 //사용자에게 title,content를 입력받아서 Board 구성하여 createBoard()넘겨주자
                 Board row = boardDataInput();
-                boolean ack = dao.createBoard(row);
+                boolean createACK = dao.createBoard(row);
 
                 // 비즈니스 로직 처리 결과로 반환된 ack를 컨트롤러가 수집
                 // 컨트롤러는 반환받은 ack값을 바탕으로 피드백
-                if(ack) {
+                if(createACK) {
                     System.out.println("글이 성공적으로 입력되었습니다.");
                 } else {
                     System.out.println("입력 실패, 다시 시도 부탁드립니다. ");
@@ -58,17 +58,24 @@ public class BoardMenu {
                 }
                 break;
             case 3:
+                int deleteBno = bnoInput();
+                boolean deleteACK = dao.deleteBoard(deleteBno);
+                if (deleteACK) {
+                    System.out.println("게시글이 성공적으로 삭제되었습니다.");
+                } else {
+                    System.out.println("게시글을 삭제하지 못했습니다.");
+                }
                 break;
             case 4:
                 System.out.println("게시글을 종료합니다.");
                 break;
             case 5:
-                int targetBno = bnoInput();
+                int updateBno = bnoInput();
                 Board newBoard = boardDataInput();
-                newBoard.setBno(targetBno);
+                newBoard.setBno(updateBno);
 
-                boolean result = dao.updateBoard(newBoard);
-                if (result) {
+                boolean updateACK = dao.updateBoard(newBoard);
+                if (updateACK) {
                     System.out.println("게시글이 성공적으로 수정되었습니다.");
                 } else {
                     System.out.println("게시글을 수정하지 못했습니다.");

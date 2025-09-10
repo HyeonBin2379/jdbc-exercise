@@ -111,11 +111,31 @@ public class BoardDAO {
         }
         return false;
     }
-//
-//    public boolean deleteBoard(int bno) {
-//    }
-//
-//
+
+    public boolean deleteBoard(int bno) {
+        conn = DBUtil.getConnection();
+        String sql = "DELETE FROM boardTable WHERE bno = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, bno);
+
+            int affected = pstmt.executeUpdate();
+            if (affected > 0) {
+                Board board = searchOne(bno);
+                boards.remove(board);
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
+        }
+        return false;
+    }
+
     public List<Board> searchAll() {
         conn = DBUtil.getConnection();
         List<Board> boardList = new ArrayList<>();
@@ -137,6 +157,10 @@ public class BoardDAO {
             return boardList;
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
         }
         return boardList;
     }
