@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BoardDAO {
 
-    private List<Board> boards = searchAll();
+    private final List<Board> boards = searchAll();
 
     public boolean createBoard(Board board) {
         // 리스트에 이미 저장된 데이터가 존재하면 기존 리스트를 사용하여 아래 작업을 진행
@@ -29,16 +29,18 @@ public class BoardDAO {
             pstmt.setString(3, board.getBwriter());
 
             // 4. 서버에서 처리된 insert 쿼리의 결과값을 처리
-            int affected = pstmt.executeUpdate();
-            boolean ok = affected > 0;
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                // 생성된 PK를 Board 객체에 반영한 후 리스트에 저장
-                if (rs.next()) {
-                    board.setBno(rs.getInt(1));
-                    boards.add(board);
+            synchronized (boards) {
+                int affected = pstmt.executeUpdate();
+                boolean ok = affected > 0;
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    // 생성된 PK를 Board 객체에 반영한 후 리스트에 저장
+                    if (rs.next()) {
+                        board.setBno(rs.getInt(1));
+                        boards.add(board);
+                    }
                 }
+                return ok;
             }
-            return ok;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -60,7 +62,6 @@ public class BoardDAO {
                 // 검색된 테이블의 행에 관한 Board 객체를 반환
                 if (rs.next()) {
                     int targetBno = rs.getInt("bno");
-
                     return boards.stream()
                             .filter(board -> targetBno == board.getBno())
                             .findAny()
@@ -74,6 +75,16 @@ public class BoardDAO {
     }
 
     public List<Board> searchAll() {
+        // 자바 코드에서 bno 순 내림차순 정렬 수행
+        Comparator<Board> comparator = Comparator.comparingInt(Board::getBno).reversed();
+
+        // boards에 데이터가 존재하면 정렬만 수행한 후 기존 리스트 반환
+        if (boards != null && !boards.isEmpty()) {
+            boards.sort(comparator);
+            return boards;
+        }
+
+        // boards에 데이터가 존재하지 않으면 전체 조회 쿼리 실행
         List<Board> boardList = new ArrayList<>();
         String sql = "SELECT * FROM boardTable";
 
@@ -94,12 +105,13 @@ public class BoardDAO {
                 boardList.add(board);
             }
             // 리스트를 bno 기준으로 내림차순 정렬
-            boardList.sort(Comparator.comparingInt(Board::getBno).reversed());
+            boardList.sort(comparator);
 
             return boardList;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        // DB에 데이터가 없는 경우에도 빈 리스트를 반환해야 함
         return boardList;
     }
 
@@ -118,19 +130,21 @@ public class BoardDAO {
             pstmt.setInt(4, newBoard.getBno());
 
             // 4. 서버에서 처리된 update 쿼리의 결과값을 처리
-            int affected = pstmt.executeUpdate();
-            if (affected > 0) {
-                // 리스트에서도 변경된 Board 객체를 찾아서 갱신
-                Board board = searchOne(newBoard.getBno());
-                int index = boards.indexOf(board);
-                boards.set(index, board);
-                return true;
+            synchronized (boards) {
+                int affected = pstmt.executeUpdate();
+                if (affected > 0) {
+                    // 리스트에서도 변경된 Board 객체를 찾아서 갱신
+                    Board board = searchOne(newBoard.getBno());
+                    int index = boards.indexOf(board);
+                    boards.set(index, board);
+                    return true;
+                }
+                return false;
             }
-            return false;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public boolean deleteBoard(int bno) {
@@ -145,16 +159,19 @@ public class BoardDAO {
             pstmt.setInt(1, bno);
 
             // 4. 서버에서 처리된 delete 쿼리의 결과값을 처리
-            int affected = pstmt.executeUpdate();
-            if (affected > 0) {
-                // 리스트에서도 게시물을 삭제
-                Board board = searchOne(bno);
-                boards.remove(board);
-                return true;
+            synchronized (boards) {
+                int affected = pstmt.executeUpdate();
+                if (affected > 0) {
+                    // 리스트에서도 게시물을 삭제
+                    Board board = searchOne(bno);
+                    boards.remove(board);
+                    return true;
+                }
+                return false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }
