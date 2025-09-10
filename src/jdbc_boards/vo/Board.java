@@ -1,10 +1,7 @@
 package jdbc_boards.vo;
 
-import lombok.*;
-
 import java.util.Date;
 
-@ToString
 public class Board {
 
     private int bno;
@@ -69,5 +66,16 @@ public class Board {
             return bno == that.bno;
         }
         throw new ClassCastException("비교할 대상의 타입이 올바르지 않습니다.");
+    }
+
+    @Override
+    public String toString() {
+        return "Board{" +
+                "bno=" + bno +
+                ", btitle='" + btitle + '\'' +
+                ", bcontent='" + bcontent + '\'' +
+                ", bwriter='" + bwriter + '\'' +
+                ", bdate=" + bdate +
+                '}';
     }
 }

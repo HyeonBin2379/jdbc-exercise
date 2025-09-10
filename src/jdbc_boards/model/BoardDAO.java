@@ -78,13 +78,13 @@ public class BoardDAO {
         // 자바 코드에서 bno 순 내림차순 정렬 수행
         Comparator<Board> comparator = Comparator.comparingInt(Board::getBno).reversed();
 
-        // boards에 데이터가 존재하면 정렬만 수행한 후 기존 리스트 반환
+        // boards에 이미 데이터가 존재하면 정렬만 수행한 후 기존 리스트 반환
         if (boards != null && !boards.isEmpty()) {
             boards.sort(comparator);
             return boards;
         }
 
-        // boards에 데이터가 존재하지 않으면 전체 조회 쿼리 실행
+        // boards에 데이터가 존재하지 않으면 전체 조회 쿼리 실행(최초 1회만 실행)
         List<Board> boardList = new ArrayList<>();
         String sql = "SELECT * FROM boardTable";
 
