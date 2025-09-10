@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 public class DBUtil {
 
-    private static ResourceBundle bundle;
+    private static final ResourceBundle bundle;
 
     static {
         bundle = ResourceBundle.getBundle("util.dbinfo");

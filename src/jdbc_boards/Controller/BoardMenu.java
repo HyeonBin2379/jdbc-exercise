@@ -11,82 +11,38 @@ import java.util.List;
 public class BoardMenu {
 
     private static final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+    private static boolean quit;
 
-    private BoardDAO dao;
+    private final BoardDAO dao;
 
     public BoardMenu(){
         dao = new BoardDAO();
     }
 
     public void boardMenu() throws IOException {
-        System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Clear | 4.Exit | 5.Update | 6.Read All");
-        System.out.println("메뉴 선택:");
-        int choice = 0;
-        try{
-            choice = Integer.parseInt(input.readLine());
-        } catch (IOException e){
-            System.out.println("입력도중 에러 발생");
-        } catch (NumberFormatException e1){
-            System.out.println("숫자만 입력하라니까");
-        } catch (Exception e2){
-            System.out.println("꿰엑 에라 모르겠다.");
+        while(!quit) {
+            System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Update | 4.Clear | 5.Exit");
+            System.out.println("메뉴 선택:");
+            int choice = 0;
+
+            try {
+                choice = Integer.parseInt(input.readLine());
+            } catch (IOException e) {
+                System.out.println("입력도중 에러 발생");
+            } catch (NumberFormatException e1) {
+                System.out.println("숫자만 입력하라니까");
+            } catch (Exception e2) {
+                System.out.println("꿰엑 에라 모르겠다.");
+            }
+
+            switch (choice) {
+                case 1 -> createBoard();
+                case 2 -> readBoard();
+                case 3 -> updateBoard();
+                case 4 -> clearBoard();
+                case 5 -> exitBoard();
+            }
         }
-
-        switch (choice){
-            case 1:
-                //사용자에게 title,content를 입력받아서 Board 구성하여 createBoard()넘겨주자
-                Board row = boardDataInput();
-                boolean createACK = dao.createBoard(row);
-
-                // 비즈니스 로직 처리 결과로 반환된 ack를 컨트롤러가 수집
-                // 컨트롤러는 반환받은 ack값을 바탕으로 피드백
-                if(createACK) {
-                    System.out.println("글이 성공적으로 입력되었습니다.");
-                } else {
-                    System.out.println("입력 실패, 다시 시도 부탁드립니다. ");
-                    //원하는 위치로 이동
-                }
-                break;
-            case 2:
-                int bno = bnoInput();
-                Board searchedOne = dao.searchOne(bno);
-                if (searchedOne != null) {
-                    System.out.println("검색 결과:");
-                    System.out.println(searchedOne);
-                } else {
-                    System.out.println("해당하는 게시글이 없습니다.");
-                }
-                break;
-            case 3:
-                int deleteBno = bnoInput();
-                boolean deleteACK = dao.deleteBoard(deleteBno);
-                if (deleteACK) {
-                    System.out.println("게시글이 성공적으로 삭제되었습니다.");
-                } else {
-                    System.out.println("게시글을 삭제하지 못했습니다.");
-                }
-                break;
-            case 4:
-                System.out.println("게시글을 종료합니다.");
-                break;
-            case 5:
-                int updateBno = bnoInput();
-                Board newBoard = boardDataInput();
-                newBoard.setBno(updateBno);
-
-                boolean updateACK = dao.updateBoard(newBoard);
-                if (updateACK) {
-                    System.out.println("게시글이 성공적으로 수정되었습니다.");
-                } else {
-                    System.out.println("게시글을 수정하지 못했습니다.");
-                }
-                break;
-            case 6:
-                List<Board> boardList = dao.searchAll();
-                boardList.forEach(System.out::println);
-                break;
-        }
-
     }
 
     public Board boardDataInput() throws IOException {
@@ -110,5 +66,78 @@ public class BoardMenu {
         System.out.println("게시글 번호 입력");
         int bno = Integer.parseInt(input.readLine());
         return bno;
+    }
+
+    public void createBoard() throws IOException {
+        //사용자에게 title,content를 입력받아서 Board 구성하여 createBoard()넘겨주자
+        Board row = boardDataInput();
+        boolean createACK = dao.createBoard(row);
+
+        // 비즈니스 로직 처리 결과로 반환된 ack를 컨트롤러가 수집
+        // 컨트롤러는 반환받은 ack값을 바탕으로 피드백
+        if(createACK) {
+            System.out.println("글이 성공적으로 입력되었습니다.");
+        } else {
+            System.out.println("입력 실패, 다시 시도 부탁드립니다. ");
+            //원하는 위치로 이동
+        }
+    }
+
+    public void readBoard() throws IOException {
+        System.out.println("게시글 조회 방식을 선택해주세요.");
+        System.out.println("보조 메뉴: 1.Read One | 2.Read All");
+        int menu = Integer.parseInt(input.readLine());
+
+        switch (menu) {
+            case 1 -> readOneBoard();
+            case 2 -> readAllBoards();
+        }
+    }
+
+    public void readOneBoard() throws IOException {
+        int bno = bnoInput();
+        Board searchedOne = dao.searchOne(bno);
+        if (searchedOne != null) {
+            System.out.println("검색 결과:");
+            System.out.println(searchedOne);
+        } else {
+            System.out.println("해당하는 게시글이 없습니다.");
+        }
+    }
+
+    public void readAllBoards() {
+        System.out.println("전체 게시글을 조회합니다.");
+        List<Board> boardList = dao.searchAll();
+        boardList.forEach(System.out::println);
+        System.out.println("전체 게시글 조회를 종료합니다.");
+    }
+
+    public void clearBoard() throws IOException {
+        int deleteBno = bnoInput();
+        boolean deleteACK = dao.deleteBoard(deleteBno);
+        if (deleteACK) {
+            System.out.println("게시글이 성공적으로 삭제되었습니다.");
+        } else {
+            System.out.println("게시글을 삭제하지 못했습니다.");
+        }
+    }
+
+    public void exitBoard() {
+        quit = true;
+        System.out.println("게시글을 종료합니다.");
+    }
+
+    public void updateBoard() throws IOException {
+        int updateBno = bnoInput();
+
+        Board newBoard = boardDataInput();
+        newBoard.setBno(updateBno);
+
+        boolean updateACK = dao.updateBoard(newBoard);
+        if (updateACK) {
+            System.out.println("게시글이 성공적으로 수정되었습니다.");
+        } else {
+            System.out.println("게시글을 수정하지 못했습니다.");
+        }
     }
 }
