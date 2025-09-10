@@ -12,7 +12,6 @@ public class Main {
             boardMenu.boardMenu();
         } catch (IOException e) {
             System.out.println(e.getMessage());
-
         }
     }
 }

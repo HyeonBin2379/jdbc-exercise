@@ -18,7 +18,7 @@ public class BoardMenu {
     }
 
     public void boardMenu() throws IOException {
-        System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Clear | 4.Exit");
+        System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Clear | 4.Exit | 5.Update");
         System.out.println("메뉴 선택:");
         int choice = 0;
         try{
@@ -48,10 +48,10 @@ public class BoardMenu {
                 break;
             case 2:
                 int bno = bnoInput();
-                Board board = dao.searchOne(bno);
-                if (board != null) {
+                Board searchedOne = dao.searchOne(bno);
+                if (searchedOne != null) {
                     System.out.println("검색 결과:");
-                    System.out.println(board);
+                    System.out.println(searchedOne);
                 } else {
                     System.out.println("해당하는 게시글이 없습니다.");
                 }
@@ -59,6 +59,19 @@ public class BoardMenu {
             case 3:
                 break;
             case 4:
+                System.out.println("게시글을 종료합니다.");
+                break;
+            case 5:
+                int targetBno = bnoInput();
+                Board newBoard = boardDataInput();
+                newBoard.setBno(targetBno);
+
+                boolean result = dao.updateBoard(newBoard);
+                if (result) {
+                    System.out.println("게시글이 성공적으로 수정되었습니다.");
+                } else {
+                    System.out.println("게시글을 수정하지 못했습니다.");
+                }
                 break;
         }
 
@@ -66,7 +79,6 @@ public class BoardMenu {
 
     public Board boardDataInput() throws IOException {
         Board board = new Board();
-
         System.out.println("새로운 글 입력");
         System.out.println("제목 입력");
         String title = input.readLine();

@@ -5,15 +5,20 @@ import util.DBUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BoardDAO {
 
-    private final ArrayList<Board> boards = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();
 
     private Connection conn;
 
     public boolean createBoard(Board board) {
         // 1. Connection 수행
+        if (boards.isEmpty()) {
+            boards = searchAll();
+        }
+
         conn = DBUtil.getConnection();
         // 2. 쿼리 생성
         String sql = "INSERT INTO boardTable(btitle, bcontent, bwriter, bdate) VALUES(?, ?, ?, now())";
@@ -41,10 +46,6 @@ public class BoardDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
-        } finally {
-            if (conn != null) {
-                try {conn.close();} catch (SQLException e) {}
-            }
         }
     }
 
@@ -78,14 +79,60 @@ public class BoardDAO {
         return null;
     }
 
-//    public Board updateBoard(Board board) {
-//    }
+    public boolean updateBoard(Board newBoard) {
+        if (boards.isEmpty()) {
+            boards = searchAll();
+        }
+
+        conn = DBUtil.getConnection();
+        String sql = "UPDATE boardTable SET btitle = ?, bcontent = ?, bwriter = ? WHERE bno = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, newBoard.getBtitle());
+            pstmt.setString(2, newBoard.getBcontent());
+            pstmt.setString(3, newBoard.getBwriter());
+            pstmt.setInt(4, newBoard.getBno());
+
+            int affected = pstmt.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
+        }
+        return false;
+    }
 //
 //    public boolean deleteBoard(int bno) {
 //    }
 //
 //
-//    public List<Board> searchAll() {
-//
-//    }
+    public List<Board> searchAll() {
+        conn = DBUtil.getConnection();
+        List<Board> boardList = new ArrayList<>();
+        String sql = "SELECT * FROM boardTable ORDER BY bno DESC";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Board board = new Board();
+
+                board.setBno(rs.getInt(1));
+                board.setBtitle(rs.getString(2));
+                board.setBcontent(rs.getString(3));
+                board.setBwriter(rs.getString(4));
+                board.setBdate(rs.getDate(5));
+            }
+            return boardList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
+        }
+        return new ArrayList<>();
+    }
 }
