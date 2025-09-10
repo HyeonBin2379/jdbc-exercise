@@ -34,7 +34,7 @@ public class BoardDAO {
                 boolean ok = affected > 0;
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     // 생성된 PK를 Board 객체에 반영한 후 리스트에 저장
-                    if (rs.next()) {
+                    if (rs.next() && ok) {
                         board.setBno(rs.getInt(1));
                         boards.add(board);
                     }
