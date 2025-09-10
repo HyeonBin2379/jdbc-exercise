@@ -30,6 +30,7 @@ public class BoardMenu {
         } catch (Exception e2){
             System.out.println("꿰엑 에라 모르겠다.");
         }
+
         switch (choice){
             case 1:
                 //사용자에게 title,content를 입력받아서 Board 구성하여 createBoard()넘겨주자
@@ -46,6 +47,14 @@ public class BoardMenu {
                 }
                 break;
             case 2:
+                int bno = bnoInput();
+                Board board = dao.searchOne(bno);
+                if (board != null) {
+                    System.out.println("검색 결과:");
+                    System.out.println(board);
+                } else {
+                    System.out.println("해당하는 게시글이 없습니다.");
+                }
                 break;
             case 3:
                 break;
@@ -71,5 +80,11 @@ public class BoardMenu {
         String writer = input.readLine();
         board.setBwriter(writer);
         return board;
+    }
+
+    public int bnoInput() throws IOException {
+        System.out.println("게시글 번호 입력");
+        int bno = Integer.parseInt(input.readLine());
+        return bno;
     }
 }

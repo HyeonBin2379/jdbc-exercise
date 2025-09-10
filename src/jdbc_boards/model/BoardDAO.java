@@ -41,20 +41,51 @@ public class BoardDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
         }
     }
 
-//    public void update(Board board) {
+    public Board searchOne(int bno) {
+        conn = DBUtil.getConnection();
+        String sql = "SELECT * FROM boardTable WHERE bno = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, bno);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Board board = new Board();
+
+                    board.setBno(rs.getInt(1));
+                    board.setBtitle(rs.getString(2));
+                    board.setBcontent(rs.getString(3));
+                    board.setBwriter(rs.getString(4));
+                    board.setBdate(rs.getDate(5));
+
+                    return board;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {conn.close();} catch (SQLException e) {}
+            }
+        }
+        return null;
+    }
+
+//    public Board updateBoard(Board board) {
 //    }
 //
-//    public void delete(int bno) {
+//    public boolean deleteBoard(int bno) {
 //    }
 //
-//    public Board selectOne(int bno) {
 //
-//    }
-//
-//    public ArrayList<Board> selectAll() {
+//    public List<Board> searchAll() {
 //
 //    }
 }
