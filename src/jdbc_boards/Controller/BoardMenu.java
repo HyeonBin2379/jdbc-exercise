@@ -6,6 +6,7 @@ import jdbc_boards.vo.Board;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class BoardMenu {
 
@@ -18,7 +19,7 @@ public class BoardMenu {
     }
 
     public void boardMenu() throws IOException {
-        System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Clear | 4.Exit | 5.Update");
+        System.out.println("메인 메뉴: 1.Create | 2.Read | 3.Clear | 4.Exit | 5.Update | 6.Read All");
         System.out.println("메뉴 선택:");
         int choice = 0;
         try{
@@ -72,6 +73,10 @@ public class BoardMenu {
                 } else {
                     System.out.println("게시글을 수정하지 못했습니다.");
                 }
+                break;
+            case 6:
+                List<Board> boardList = dao.searchAll();
+                boardList.forEach(System.out::println);
                 break;
         }
 

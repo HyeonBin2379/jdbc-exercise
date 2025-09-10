@@ -60,11 +60,11 @@ public class BoardDAO {
                 if (rs.next()) {
                     Board board = new Board();
 
-                    board.setBno(rs.getInt(1));
-                    board.setBtitle(rs.getString(2));
-                    board.setBcontent(rs.getString(3));
-                    board.setBwriter(rs.getString(4));
-                    board.setBdate(rs.getDate(5));
+                    board.setBno(rs.getInt("bno"));
+                    board.setBtitle(rs.getString("btitle"));
+                    board.setBcontent(rs.getString("bcontent"));
+                    board.setBwriter(rs.getString("bwriter"));
+                    board.setBdate(rs.getDate("bdate"));
 
                     return board;
                 }
@@ -94,7 +94,14 @@ public class BoardDAO {
             pstmt.setInt(4, newBoard.getBno());
 
             int affected = pstmt.executeUpdate();
-            return affected > 0;
+            if (affected > 0) {
+                Board board = searchOne(newBoard.getBno());
+
+                int index = boards.indexOf(board);
+                boards.set(index, board);
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -119,20 +126,18 @@ public class BoardDAO {
             while (rs.next()) {
                 Board board = new Board();
 
-                board.setBno(rs.getInt(1));
-                board.setBtitle(rs.getString(2));
-                board.setBcontent(rs.getString(3));
-                board.setBwriter(rs.getString(4));
-                board.setBdate(rs.getDate(5));
+                board.setBno(rs.getInt("bno"));
+                board.setBtitle(rs.getString("btitle"));
+                board.setBcontent(rs.getString("bcontent"));
+                board.setBwriter(rs.getString("bwriter"));
+                board.setBdate(rs.getDate("bdate"));
+
+                boardList.add(board);
             }
             return boardList;
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (conn != null) {
-                try {conn.close();} catch (SQLException e) {}
-            }
         }
-        return new ArrayList<>();
+        return boardList;
     }
 }
