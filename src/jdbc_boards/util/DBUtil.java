@@ -3,17 +3,16 @@ package jdbc_boards.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 public class DBUtil {
 
-    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://localhost:3306/bookmarketdb?serverTimezone=Asia/Seoul";
-    private static final String USERNAME = "bookadmin";
-    private static final String PASSWORD = "bookadmin";
+    private static ResourceBundle bundle;
 
     static {
+        bundle = ResourceBundle.getBundle("util.dbinfo");
         try {
-            Class.forName(DRIVER);
+            Class.forName(bundle.getString("driver"));
             System.out.println("드라이버 로딩 성공");
         } catch (ClassNotFoundException e) {
             System.out.println("드라이버 로딩 실패");
@@ -23,7 +22,11 @@ public class DBUtil {
 
     public static Connection getConnection() {
         try {
-            return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            return DriverManager.getConnection(
+                    bundle.getString("url"),
+                    bundle.getString("username"),
+                    bundle.getString("password")
+            );
         } catch(SQLException e) {
             throw new RuntimeException(e);
         }
