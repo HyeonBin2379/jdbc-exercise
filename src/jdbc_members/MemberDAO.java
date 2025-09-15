@@ -1,6 +1,5 @@
 package jdbc_members;
 
-import com.mysql.cj.xdevapi.Type;
 import util.DBUtil;
 
 import java.io.BufferedReader;
