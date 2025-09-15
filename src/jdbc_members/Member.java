@@ -1,11 +1,11 @@
-package jdbc_boards.vo;
+package jdbc_members;
 
 import java.util.Date;
 
 public class Member {
 
     private int mSeq;
-    private String mUser;
+    private String mUserID;
     private String mPwd;
     private String mEmail;
     private String mHp;
@@ -15,9 +15,9 @@ public class Member {
     public Member() {
     }
 
-    public Member(int mSeq, String mUser, String mPwd, String mEmail, String mHp, Date mRegistDate, int mPoint) {
+    public Member(int mSeq, String mUserID, String mPwd, String mEmail, String mHp, Date mRegistDate, int mPoint) {
         this.mSeq = mSeq;
-        this.mUser = mUser;
+        this.mUserID = mUserID;
         this.mPwd = mPwd;
         this.mEmail = mEmail;
         this.mHp = mHp;
@@ -33,12 +33,12 @@ public class Member {
         this.mSeq = mSeq;
     }
 
-    public String getmUser() {
-        return mUser;
+    public String getmUserID() {
+        return mUserID;
     }
 
-    public void setmUser(String mUser) {
-        this.mUser = mUser;
+    public void setmUserID(String mUserID) {
+        this.mUserID = mUserID;
     }
 
     public String getmPwd() {
@@ -93,7 +93,7 @@ public class Member {
     public String toString() {
         return "Member{" +
                 "mSeq=" + mSeq +
-                ", mUser='" + mUser + '\'' +
+                ", mUser='" + mUserID + '\'' +
                 ", mEmail='" + mEmail + '\'' +
                 ", mHp='" + mHp + '\'' +
                 ", mRegistDate=" + mRegistDate +
