@@ -102,7 +102,11 @@ CALL SP_MEMBER_SEARCH('apple');
 -- 회원정보 수정: 다중분기 처리(비밀번호 or 이메일 or 연락처 수정)
 DROP PROCEDURE IF EXISTS SP_MEMBER_UPDATE;
 DELIMITER $$
-CREATE PROCEDURE SP_MEMBER_UPDATE(IN V_USERID VARCHAR(20), IN MENU_OPTION INT, IN V_INFO VARCHAR(50))
+CREATE PROCEDURE SP_MEMBER_UPDATE(
+    IN V_USERID VARCHAR(20),
+    IN MENU_OPTION INT,
+    IN V_INFO VARCHAR(50),
+    OUT MSG VARCHAR(100))
 BEGIN
     SET @userID = V_USERID;
     SET @updateQuery = 'UPDATE TB_MEMBER SET ';
@@ -116,6 +120,8 @@ BEGIN
             EXECUTE stmt USING @pwd, @userID;
 
             DEALLOCATE PREPARE stmt;
+
+            SET MSG = '현재 회원의 비밀번호 변경이 완료되었습니다.';
         WHEN MENU_OPTION = 2 THEN
             SET @email = V_INFO;
             SET @updateQuery = concat(@updateQuery, 'm_email = ? WHERE m_userid = ?');
@@ -125,6 +131,7 @@ BEGIN
 
             DEALLOCATE PREPARE stmt;
 
+            SET MSG = '현재 회원의 이메일 변경이 완료되었습니다.';
         WHEN MENU_OPTION = 3 THEN
             SET @hp = V_INFO;
             SET @updateQuery = concat(@updateQuery, 'm_hp = ? WHERE m_userid = ?');
@@ -133,6 +140,8 @@ BEGIN
             EXECUTE stmt USING @hp, @userID;
 
             DEALLOCATE PREPARE stmt;
+
+            SET MSG = '현재 회원의 핸드폰번호 변경이 완료되었습니다.';
     END CASE;
 END $$
 DELIMITER ;

@@ -1,5 +1,6 @@
 package jdbc_members;
 
+import com.mysql.cj.xdevapi.Type;
 import util.DBUtil;
 
 import java.io.BufferedReader;
@@ -48,7 +49,7 @@ public class MemberDAO {
 
         try (Connection conn = DBUtil.getConnection();
              CallableStatement call = conn.prepareCall(sql)) {
-            call.setString(1, "apple");
+            call.setString(1, userID);
             try (ResultSet rs = call.executeQuery()) {
                 if (rs.next()) {
                     Member member = new Member();
@@ -103,12 +104,14 @@ public class MemberDAO {
         System.out.println("변경할 정보를 선택하세요: 1.비밀번호 | 2.이메일 | 3.핸드폰번호");
         int menuOption = Integer.parseInt(br.readLine());
 
-        String sql = "{call SP_MEMBER_UPDATE(?, ?, ?)}";
+        String sql = "{call SP_MEMBER_UPDATE(?, ?, ?, ?)}";
         try (Connection conn = DBUtil.getConnection();
              CallableStatement call = conn.prepareCall(sql)) {
 
             call.setString(1, newMember.getmUserID());
             call.setInt(2, 1);
+            call.registerOutParameter(4, Types.VARCHAR);
+
             switch (menuOption) {
                 case 1:
                     System.out.println("비밀번호를 변경합니다.");
@@ -129,6 +132,7 @@ public class MemberDAO {
                 Member member = searchOne(newMember.getmUserID());
                 int index = members.indexOf(member);
                 members.set(index, member);
+                System.out.println(call.getString(1));
                 System.out.println("회원정보 수정이 완료되었습니다.");
                 return true;
             }
