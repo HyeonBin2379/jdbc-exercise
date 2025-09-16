@@ -1,4 +1,4 @@
-package jdbc_members;
+package jdbc_members.vo;
 
 import java.util.Date;
 
@@ -13,6 +13,7 @@ public class Member {
     private int mPoint;
 
     public Member() {
+        this.mRegistDate = new Date();
     }
 
     public Member(int mSeq, String mUserID, String mPwd, String mEmail, String mHp, Date mRegistDate, int mPoint) {

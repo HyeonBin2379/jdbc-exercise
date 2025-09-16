@@ -1,10 +1,9 @@
-package jdbc_members;
+package jdbc_members.model;
 
+import jdbc_members.vo.Member;
 import util.DBUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +30,6 @@ public class MemberDAO {
             call.execute();
 
             int rtn = call.getInt(5);
-            if (rtn == 100) {
-                System.out.println("이미 가입된 사용자입니다.");
-            } else {
-                System.out.println("회원 가입이 완료되었습니다.");
-            }
             return rtn == 200;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,18 +92,12 @@ public class MemberDAO {
         return members;
     }
 
-    public boolean updateMember(Member newMember) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("변경할 정보를 선택하세요: 1.비밀번호 | 2.이메일 | 3.핸드폰번호");
-        int menuOption = Integer.parseInt(br.readLine());
-
+    public boolean updateMember(int menuOption, Member newMember) throws IOException {
         String sql = "{call SP_MEMBER_UPDATE(?, ?, ?, ?)}";
         try (Connection conn = DBUtil.getConnection();
              CallableStatement call = conn.prepareCall(sql)) {
-
             call.setString(1, newMember.getmUserID());
-            call.setInt(2, 1);
-            call.registerOutParameter(4, Types.VARCHAR);
+            call.setInt(2, menuOption);
 
             switch (menuOption) {
                 case 1:
@@ -125,6 +113,7 @@ public class MemberDAO {
                     call.setString(3, newMember.getmHp());
                     break;
             }
+            call.registerOutParameter(4, Types.VARCHAR);
 
             int affected = call.executeUpdate();
             if (affected > 0) {
@@ -133,8 +122,8 @@ public class MemberDAO {
                 members.set(index, member);
                 System.out.println(call.getString(1));
                 System.out.println("회원정보 수정이 완료되었습니다.");
-                return true;
             }
+            return affected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }

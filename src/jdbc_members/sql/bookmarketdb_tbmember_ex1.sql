@@ -143,10 +143,12 @@ BEGIN
 
             SET MSG = '현재 회원의 핸드폰번호 변경이 완료되었습니다.';
     END CASE;
+    COMMIT;
 END $$
 DELIMITER ;
 
-CALL SP_MEMBER_UPDATE('apple', 1, '12345678');
+CALL SP_MEMBER_UPDATE('apple', 1, '12345678', @msg);
+select @msg;
 
 -- 회원정보 삭제: 지정한 id 삭제
 DROP PROCEDURE IF EXISTS SP_MEMBER_DELETE;
