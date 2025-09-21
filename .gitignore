@@ -22,7 +22,7 @@ bin/
 /nbdist/
 /.nb-gradle/
 /.idea/
-jdbc.iml
+jdbc-exercise.iml
 
 ### VS Code ###
 .vscode/

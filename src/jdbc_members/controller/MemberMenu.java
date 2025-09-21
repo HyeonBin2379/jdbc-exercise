@@ -159,9 +159,9 @@ public class MemberMenu {
 
         boolean updateACK = dao.updateMember(menuOption, toUpdate);
         if (updateACK) {
-            System.out.println("게시글이 성공적으로 수정되었습니다.");
+            System.out.println("회원정보가 성공적으로 수정되었습니다.");
         } else {
-            System.out.println("게시글을 수정하지 못했습니다.");
+            System.out.println("회원정보를 수정하지 못했습니다.");
         }
     }
 }

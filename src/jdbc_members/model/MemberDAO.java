@@ -114,16 +114,16 @@ public class MemberDAO {
                     break;
             }
             call.registerOutParameter(4, Types.VARCHAR);
+            call.execute();
 
-            int affected = call.executeUpdate();
-            if (affected > 0) {
+            String resultMessage = call.getString(4);
+            if (resultMessage != null && resultMessage.contains("완료")) {
                 Member member = searchOne(newMember.getmUserID());
                 int index = members.indexOf(member);
                 members.set(index, member);
-                System.out.println(call.getString(1));
-                System.out.println("회원정보 수정이 완료되었습니다.");
+                System.out.println(call.getString(4));
+                return true;
             }
-            return affected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -131,17 +131,18 @@ public class MemberDAO {
     }
 
     public boolean deleteMember(String userID) {
-        String sql = "{call SP_MEMBER_DELETE(?)}";
+        String sql = "{call SP_MEMBER_DELETE(?, ?)}";
 
         try (Connection conn = DBUtil.getConnection();
                 CallableStatement call = conn.prepareCall(sql)) {
             call.setString(1, userID);
-            int affected = call.executeUpdate();
+            call.registerOutParameter(2, Types.VARCHAR);
+            call.execute();
 
-            if (affected > 0) {
+            String message = call.getString(2);
+            if (message != null && message.contains(userID)) {
                 Member member = searchOne(userID);
                 members.remove(member);
-                System.out.println("회원 탈퇴가 완료되었습니다.");
                 return true;
             }
         } catch (SQLException e) {
