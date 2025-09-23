@@ -1,4 +1,4 @@
-package exercise_v1.vo;
+package exercise_v1.domain;
 
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -26,13 +26,12 @@ public class Member extends User {
                 ", login=" + login +
                 ", start_date=" + start_date +
                 ", expired_date=" + expired_date +
-                ", id='" + id + '\'' +
-                ", isApproved=" + isApproved +
-                ", pwd='" + pwd + '\'' +
-                ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", type='" + type + '\'' +
+                ", id='" + getId() + '\'' +
+                ", pwd='" + getPwd() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", phone='" + getPhone() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", type='" + getType() + '\'' +
                 '}';
     }
 }

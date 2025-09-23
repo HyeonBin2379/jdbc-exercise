@@ -1,4 +1,4 @@
-package exercise_v1.vo;
+package exercise_v1.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public abstract class User {
 
-    protected String id;
-    protected boolean isApproved;
-    protected String pwd;
-    protected String name;
-    protected String phone;
-    protected String email;
-    protected String type;
+    private String id;
+    private String pwd;
+    private String name;
+    private String phone;
+    private String email;
+    private String type;
 
     @Override
     public boolean equals(Object o) {
