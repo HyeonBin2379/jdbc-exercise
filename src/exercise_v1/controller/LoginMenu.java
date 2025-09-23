@@ -38,7 +38,10 @@ public class LoginMenu {
                 System.out.print(LoginMessage.LOGIN_MENU_TITLE);
                 String menuNum = input.readLine();
                 switch (menuNum) {
-                    case "1" -> login();
+                    case "1" -> {
+                        login();
+                        wmsMenu.run();
+                    }
                     case "2" -> register();
                     case "3" -> findID();
                     case "4" -> findPassword();
@@ -64,11 +67,13 @@ public class LoginMenu {
             call.setString(2, userPwd);
             call.registerOutParameter(3, Types.VARCHAR);
 
-            call.execute();
+            if(!call.execute()) {
+                return;
+            }
 
             String userType = call.getString(3);
             System.out.println(userType);
-            try (ResultSet rs = call.getResultSet()) {
+            try (ResultSet rs = call.getResultSet();) {
                 if (rs.next()) {
                     if (userType.contains("관리자")) {
                         Manager manager = new Manager();
@@ -82,15 +87,14 @@ public class LoginMenu {
                         manager.setPosition(rs.getString(8));
 
                         loginUser = manager;
+                        wmsMenu = WMSMenu.getInstance(manager);
                     } else if (userType.equals("일반회원")) {
 
                     }
                 }
             }
-            wmsMenu = WMSMenu.getInstance(loginUser);
-            wmsMenu.run();
         } catch (SQLException e) {
-
+            System.out.println(e.getMessage());
         }
     }
 
@@ -128,9 +132,6 @@ public class LoginMenu {
 
     public void exitLoginMenu() {
         quitLogin = true;
-        if (loginUser != null) {
-
-        }
         System.out.println(LoginMessage.EXIT_LOGIN_MENU);
     }
 }
