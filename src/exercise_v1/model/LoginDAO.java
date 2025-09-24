@@ -9,8 +9,6 @@ import java.sql.*;
 
 public class LoginDAO {
 
-    private User loginUser;
-
     public String getUserType(String userID, String userPwd) throws SQLException {
         String sql = "{call get_user_type(?, ?, ?)}";
         String userType;
@@ -30,14 +28,14 @@ public class LoginDAO {
         try {
             String userType = getUserType(userID, userPwd);
             if (userType.contains("관리자")) {
-                loginUser = loginManager(userID, userPwd, userType);
+                return loginManager(userID, userPwd, userType);
             } else {
-                loginUser = loginMember(userID, userPwd, userType);
+                return loginMember(userID, userPwd, userType);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return loginUser;
+        return null;
     }
 
     public Manager loginManager(String userID, String userPwd, String userType) throws SQLException {
@@ -90,9 +88,10 @@ public class LoginDAO {
                             rs.getString(5)
                     );
                     member.setCompanyCode(rs.getString(6));
-                    member.setLogin(rs.getBoolean(6));
-                    member.setStart_date(rs.getDate(7));
-                    member.setExpired_date(rs.getDate(8));
+                    member.setAddress(rs.getString(7));
+                    member.setLogin(rs.getBoolean(8));
+                    member.setStart_date(rs.getDate(9));
+                    member.setExpired_date(rs.getDate(10));
                 }
             }
         }
@@ -152,5 +151,23 @@ public class LoginDAO {
             System.out.println(e.getMessage());
         }
         return foundPwd;
+    }
+
+    public static void logout(String userID) {
+        String sql = "call logout(?, ?)";
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userID);
+            call.registerOutParameter(2, Types.VARCHAR);
+
+            call.execute();
+
+            String result = call.getString(2);
+            if (result != null) {
+                System.out.println(result);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
