@@ -7,14 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class User {
+public class User {
 
     protected String id;
     protected String pwd;
     protected String name;
     protected String phone;
     protected String email;
-    protected String company_code;
+    protected String companyCode;
+    protected String address;
     protected String type;
 
     public User() {

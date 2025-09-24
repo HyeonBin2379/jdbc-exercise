@@ -99,24 +99,24 @@ public class LoginDAO {
         return member;
     }
 
-    public boolean registerMember(User user) {
-        String sql = "call ";
-        try (Connection conn = DBUtil.getConnection()) {
+    public boolean register(User user) {
+        String sql = "call register(?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBUtil.getConnection(); CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, user.getId());
+            call.setString(2, user.getPwd());
+            call.setString(3, user.getName());
+            call.setString(4, user.getPhone());
+            call.setString(5, user.getEmail());
+            call.setString(6, user.getCompanyCode());
+            call.setString(7, user.getAddress());
+            call.setString(8, user.getType());
 
+            int affected = call.executeUpdate();
+            return affected > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return false;
-    }
-
-    public boolean registerManager(User user) {
-        String sql = "";
-        try (Connection conn = DBUtil.getConnection()) {
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return true;
     }
 
     public String findID(String userEmail) {

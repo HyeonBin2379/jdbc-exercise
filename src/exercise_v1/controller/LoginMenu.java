@@ -61,14 +61,66 @@ public class LoginMenu {
         System.out.print(LoginMessage.INPUT_MEMBERSHIP_TYPE);
         String type = input.readLine();
 
-        User user = null;
         boolean ack = false;
         switch (type) {
             case "1":
+                User newMember = inputMemberInfo();
+                ack = dao.register(newMember);
                 break;
             case "2":
+                User newManager = inputManagerInfo();
+                ack = dao.register(newManager);
                 break;
         }
+
+        if (ack) {
+            System.out.println("회원가입이 완료되었습니다.");
+        } else {
+            System.out.println("회원가입에 실패했습니다.");
+        }
+    }
+
+    public User inputMemberInfo() throws IOException {
+        LoginMessage.print(LoginMessage.MEMBER_REGISTER);
+
+        System.out.println(LoginMessage.INPUT_ID);
+        String userID = input.readLine();
+        System.out.println(LoginMessage.INPUT_PWD);
+        String userPwd = input.readLine();
+        System.out.println(LoginMessage.INPUT_COMPANY_NAME);
+        String companyName = input.readLine();
+        System.out.println(LoginMessage.INPUT_PHONE);
+        String phone = input.readLine();
+        System.out.println(LoginMessage.INPUT_EMAIL);
+        String email = input.readLine();
+        System.out.println(LoginMessage.INPUT_COMPANY_CODE);
+        String companyCode = input.readLine();
+        System.out.println(LoginMessage.INPUT_ADDRESS);
+        String address = input.readLine();
+
+        User newUser = new User(userID, userPwd, companyName, phone, email, "일반회원");
+        newUser.setCompanyCode(companyCode);
+        newUser.setAddress(address);
+        return newUser;
+    }
+
+    public User inputManagerInfo() throws IOException {
+        LoginMessage.print(LoginMessage.MEMBER_REGISTER);
+        System.out.println(LoginMessage.INPUT_ID);
+        String userID = input.readLine();
+        System.out.println(LoginMessage.INPUT_PWD);
+        String userPwd = input.readLine();
+        System.out.println(LoginMessage.INPUT_NAME);
+        String name = input.readLine();
+        System.out.println(LoginMessage.INPUT_PHONE);
+        String phone = input.readLine();
+        System.out.println(LoginMessage.INPUT_EMAIL);
+        String email = input.readLine();
+        System.out.println(LoginMessage.INPUT_MANAGER_POSITION);
+        String position = input.readLine();
+
+        User newUser = new User(userID, userPwd, name, phone, email, position);
+        return newUser;
     }
 
     public void findID() throws IOException {
