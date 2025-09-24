@@ -4,20 +4,29 @@ use testdb1;
 # 1. 로그인 메뉴의 주요 기능 구현
 #########################################################
 # 1-1. 로그인 프로시저 작성
-DROP PROCEDURE IF EXISTS login;
+DROP PROCEDURE IF EXISTS get_user_type;
 DELIMITER $$
-CREATE PROCEDURE login(IN login_id varchar(15), IN login_pwd varchar(20), OUT register_type varchar(10))
+CREATE PROCEDURE get_user_type(IN login_id varchar(15), IN login_pwd varchar(20), OUT userType varchar(10))
+BEGIN
+    select user_type into userType
+    from users
+    where user_id = login_id and user_pwd = login_pwd and user_approval = '승인완료';
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS login_member;
+DELIMITER $$
+CREATE PROCEDURE login_member(IN login_id varchar(15), IN login_pwd varchar(20), IN userType varchar(10))
 BEGIN
 	declare found_count int;			-- 찾은 회원 수
     declare already_login boolean;		-- 이미 로그인한 상태인지 확인
     
-    -- 입력한 아이디와 비밀번호와 일치하는 회원의 수, 회원유형을 구한다.
-    select user_type, count(*) into register_type, found_count
+    -- 입력한 아이디와 비밀번호와 일치하는 회원의 수를 구한다.
+    select count(*) into found_count
     from users
-    where user_id = login_id and user_pwd = login_pwd and user_approval = '승인완료'
-    group by user_type;
+    where user_id = login_id and user_pwd = login_pwd and user_approval = '승인완료';
     
-    if (register_type = '일반회원') then
+    if (userType = '일반회원') then
 		-- 현재 회원의 로그인 여부를 확인한다.
         select member_login into already_login from members where member_id = login_id;
         
@@ -26,22 +35,39 @@ BEGIN
 			update members set member_login = true where member_id = login_id;
 			select * from members where member_id = login_id;
         end if;
-	elseif (register_type like '%관리자') then
-		-- 현재 회원의 로그인 여부를 확인한다.
-		select manager_login into already_login from managers where manager_id = login_id;
-        
-        -- 로그인한 상태가 아니면 로그인한다.
-		if (found_count = 1 and already_login = false) then
-			update managers set manager_login = true where manager_id = login_id;
-			select * from managers where manager_id = login_id;
-        end if;
 	end if;
 END $$
 DELIMITER ;
-call login('wmsmember', 'wms123456', @userType);
-call login('wmsAdmin', 'admin1234', @userType);
+
+DROP PROCEDURE IF EXISTS login_manager;
+DELIMITER $$
+CREATE PROCEDURE login_manager(IN login_id varchar(15), IN login_pwd varchar(20), IN userType varchar(10))
+BEGIN
+    declare found_count int;			-- 찾은 회원 수
+    declare already_login boolean;		-- 이미 로그인한 상태인지 확인
+
+    -- 입력한 아이디와 비밀번호와 일치하는 회원의 수, 회원유형을 구한다.
+    select count(*) into found_count
+    from users
+    where user_id = login_id and user_pwd = login_pwd and user_approval = '승인완료';
+
+    if (userType like '%관리자') then
+        -- 현재 회원의 로그인 여부를 확인한다.
+        select manager_login into already_login from managers where manager_id = login_id;
+
+        -- 로그인한 상태가 아니면 로그인한다.
+        if (found_count = 1 and already_login = false) then
+            update managers set manager_login = true where manager_id = login_id;
+            select * from managers where manager_id = login_id;
+        end if;
+    end if;
+END $$
+DELIMITER ;
+
+call login_member('wmsmember', 'wms123456', @userType);
+call login_manager('wmsAdmin', 'admin1234', @userType);
 select @userType;
-call login('wmscargoman', 'wms123456', @userType);
+call login_manager('wmscargoman', 'wms123456', @userType);
 
 #####################################################
 # 1-2. 회원등록(회원가입) 프로시저 & 트리거 작성
@@ -140,7 +166,7 @@ delete from managers;
 
 DROP PROCEDURE IF EXISTS find_userID;
 DELIMITER $$
-CREATE PROCEDURE find_userID(IN email varchar(30), OUT found_ID varchar(15), OUT message varchar(50))
+CREATE PROCEDURE find_userID(IN email varchar(30), OUT found_ID varchar(15))
 BEGIN
     declare userType varchar(10);
     
@@ -148,12 +174,8 @@ BEGIN
     
     if (userType like '%관리자') then
 		select manager_id into found_ID from managers where manager_email = email;
-        set message = concat('입력한 아이디에 해당하는 비밀번호는 ', found_ID, '입니다.');
 	elseif (userType = '일반회원') then
 		select member_id into found_ID from members where member_email = email;
-        set message = concat('입력한 아이디에 해당하는 비밀번호는 ', found_ID, '입니다.');
-	else
-        set message = '입력한 이메일에 해당하는 아이디를 찾을 수 없습니다.';
     end if;
 END $$
 DELIMITER ;
@@ -171,7 +193,7 @@ select @found_ID, @result;
 
 DROP PROCEDURE IF EXISTS find_pwd;
 DELIMITER $$
-CREATE PROCEDURE find_pwd(IN userID varchar(15), OUT found_pwd varchar(20), OUT message varchar(50))
+CREATE PROCEDURE find_pwd(IN userID varchar(15), OUT found_pwd varchar(20))
 BEGIN
     declare userType varchar(10);
     
@@ -179,12 +201,8 @@ BEGIN
     
     if (userType like '%관리자') then
 		select manager_pwd into found_pwd from managers where manager_id = userID;
-        set message = concat('입력한 아이디에 해당하는 비밀번호는 ', found_pwd, '입니다.');
 	elseif (userType = '일반회원') then
 		select member_pwd into found_pwd from members where member_id = userID;
-        set message = concat('입력한 아이디에 해당하는 비밀번호는 ', found_pwd, '입니다.');
-	else
-		set message = '입력한 아이디에 해당하는 비밀번호를 찾을 수 없습니다.';
     end if;
 END $$
 DELIMITER ;
@@ -235,7 +253,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-call login('wmscargoman', 'wms123456');
+call login_manager('wmscargoman', 'wms123456', '창고관리자');
 call logout('wmscargoman', @result);
 call logout('wmsAdmin', @result);
 select @result;

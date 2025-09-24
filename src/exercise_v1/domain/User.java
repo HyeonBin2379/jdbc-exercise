@@ -7,16 +7,26 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public abstract class User {
 
-    private String id;
-    private String pwd;
-    private String name;
-    private String phone;
-    private String email;
-    private String type;
+    protected String id;
+    protected String pwd;
+    protected String name;
+    protected String phone;
+    protected String email;
+    protected String company_code;
+    protected String type;
+
+    public User() {
+    }
+    public User(String id, String pwd, String name, String phone, String email, String type) {
+        this.id = id;
+        this.pwd = pwd;
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.type = type;
+    }
 
     @Override
     public boolean equals(Object o) {

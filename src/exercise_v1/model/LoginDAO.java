@@ -1,6 +1,156 @@
 package exercise_v1.model;
 
+import exercise_v1.domain.Manager;
+import exercise_v1.domain.Member;
+import exercise_v1.domain.User;
+import util.DBUtil;
+
+import java.sql.*;
+
 public class LoginDAO {
 
+    private User loginUser;
 
+    public String getUserType(String userID, String userPwd) throws SQLException {
+        String sql = "{call get_user_type(?, ?, ?)}";
+        String userType;
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userID);
+            call.setString(2, userPwd);
+            call.registerOutParameter(3, Types.VARCHAR);
+            call.execute();
+
+            userType = call.getString(3);
+        }
+        return userType;
+    }
+
+    public User login(String userID, String userPwd) {
+        try {
+            String userType = getUserType(userID, userPwd);
+            if (userType.contains("관리자")) {
+                loginUser = loginManager(userID, userPwd, userType);
+            } else {
+                loginUser = loginMember(userID, userPwd, userType);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return loginUser;
+    }
+
+    public Manager loginManager(String userID, String userPwd, String userType) throws SQLException {
+        String sql = "{call login_manager(?, ?, ?)}";
+        Manager manager = null;
+
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userID);
+            call.setString(2, userPwd);
+            call.setString(3, userType);
+
+            boolean hasResultSet = call.execute();
+            do {
+                ResultSet rs = call.getResultSet();
+                if (hasResultSet && rs.next()) {
+                    manager = new Manager(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getString(8)
+                    );
+                    manager.setLogin(rs.getBoolean(6));
+                    manager.setHireDate(rs.getDate(7));
+                }
+            } while (call.getMoreResults());
+        }
+        return manager;
+    }
+
+    public Member loginMember(String userID, String userPwd, String userType) throws SQLException {
+        String sql = "{call login_member(?, ?, ?)}";
+        Member member = null;
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userID);
+            call.setString(2, userPwd);
+            call.setString(3, userType);
+
+            call.execute();
+            try (ResultSet rs = call.getResultSet()) {
+                if (rs.next()) {
+                    member = new Member(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5)
+                    );
+                    member.setCompanyCode(rs.getString(6));
+                    member.setLogin(rs.getBoolean(6));
+                    member.setStart_date(rs.getDate(7));
+                    member.setExpired_date(rs.getDate(8));
+                }
+            }
+        }
+        return member;
+    }
+
+    public boolean registerMember(User user) {
+        String sql = "call ";
+        try (Connection conn = DBUtil.getConnection()) {
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean registerManager(User user) {
+        String sql = "";
+        try (Connection conn = DBUtil.getConnection()) {
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return true;
+    }
+
+    public String findID(String userEmail) {
+        String sql = "{call find_userID(?, ?)}";
+        String foundID = null;
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userEmail);
+            call.registerOutParameter(2, Types.VARCHAR);
+
+            call.execute();
+
+            foundID = call.getString(2);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return foundID;
+    }
+
+    public String findPassword(String userID) {
+        String sql = "{call find_pwd(?, ?)}";
+        String foundPwd = null;
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, userID);
+            call.registerOutParameter(2, Types.VARCHAR);
+
+            call.execute();
+
+            foundPwd = call.getString(2);
+            return foundPwd;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return foundPwd;
+    }
 }
