@@ -6,27 +6,38 @@ use testdb1;
 ######################################################################
 
 -- 현재 로그인한 일반회원/관리자 자신의 정보만 조회(구현, 단위테스트 완료)
-DROP PROCEDURE IF EXISTS current_user_info;
+DROP PROCEDURE IF EXISTS current_member_info;
 DELIMITER $$
-CREATE PROCEDURE current_user_info(IN currentID varchar(15))
+CREATE PROCEDURE current_member_info(IN currentID varchar(15))
 BEGIN
 	SET @loginID = currentID;
-    
-    -- 현재 로그인 중인 회원 자신의 회원유형을 확인.
-    SELECT user_type INTO @userType FROM users WHERE user_id = currentID and user_approval = '승인완료';
-    
+	SET @memberInfo = 'SELECT * FROM members WHERE member_id = ? and member_login = true;';
+
     -- 확인한 회원가입유형에 해당하는 회원 자신의 정보를 일반회원/관리자 테이블에서 찾아 조회한다.
-    IF (@userType = '일반회원') THEN
-		SELECT * FROM members WHERE member_id = currentID and member_login = true;
-    ELSEIF (@userType like '%관리자') THEN
-		SELECT * FROM managers WHERE manager_id = currentID and manager_login = true;
-    END IF;
+    prepare searchQuery from @memberInfo;
+	execute searchQuery using @loginID;
+
+	deallocate prepare searchQuery;
 END $$
 DELIMITER ;
 
-call current_user_info('wmsmember');
-call current_user_info('wmscargoman');
-call current_user_info('wmsAdmin');
+DELIMITER $$
+CREATE PROCEDURE current_manager_info(IN currentID varchar(15))
+BEGIN
+    SET @loginID = currentID;
+    SET @managerInfo = 'SELECT * FROM managers WHERE manager_id = ? and manager_login = true;';
+
+    -- 확인한 회원가입유형에 해당하는 회원 자신의 정보를 일반회원/관리자 테이블에서 찾아 조회한다.
+    prepare searchQuery from @managerInfo;
+    execute searchQuery using @loginID;
+
+    deallocate prepare searchQuery;
+END $$
+DELIMITER ;
+
+call current_member_info('wmsmember');
+call current_manager_info('wmscargoman');
+call current_manager_info('wmsAdmin');
 
 -- 현재 로그인한 일반회원 자신의 정보를 갱신(구현, 단위테스트 완료)
 DROP PROCEDURE IF EXISTS member_update;
@@ -155,7 +166,7 @@ BEGIN
     -- 회원 정보 삭제: 삭제 시 아이디 중복으로 인해 미승인된 건까지 모두 삭제
     SET @loginID = currentID;
     
-    SET @deleteMember = 'delete from users where user_id = ?';
+    SET @deleteMember = 'delete from users where user_id = ? and user_type != \'총관리자\'';
     PREPARE deleteQuery FROM @deleteMember;
     EXECUTE deleteQuery USING @loginID;
     
@@ -179,6 +190,14 @@ BEGIN
 END $$
 DELIMITER ;
 
+call user_delete('wmscargoman');
+
+delete from managers where manager_id = 'wmscargoman';
+
+select * from users;
+select * from members;
+select * from managers;
+
 ##########################################################
 # 2. 관리자 전용 회원관리 기능
 ##########################################################
@@ -187,6 +206,8 @@ DROP PROCEDURE IF EXISTS manager_search;
 DELIMITER $$
 CREATE PROCEDURE manager_search(IN currentID varchar(15), IN userType varchar(10))
 BEGIN
-	
+	if (userType like '%관리자') then
+
+    end if;
 END $$
 DELIMITER ;

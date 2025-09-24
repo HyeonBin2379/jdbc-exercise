@@ -1,6 +1,6 @@
 package exercise_v1.controller;
 
-import exercise_v1.constant.WMSMessage;
+import exercise_v1.constant.WMSPage;
 import exercise_v1.domain.Manager;
 import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
@@ -39,7 +39,7 @@ public class WMSMenu {
     }
 
     public void memberMenuList(Member member) throws IOException {
-        System.out.print(WMSMessage.MEMBER_MENU_TITLE);
+        System.out.print(WMSPage.MEMBER_MENU_TITLE);
         String menuNum = input.readLine();
         switch (menuNum) {
             case "1":   // 회원관리
@@ -61,7 +61,7 @@ public class WMSMenu {
 
     public void managerMenuList(Manager manager) throws IOException {
         // 관리자 전용 기능이 존재하여 memberMenu(), managerMenu()를 구분
-        System.out.print(WMSMessage.MANAGER_MENU_TITLE);
+        System.out.print(WMSPage.MANAGER_MENU_TITLE);
         String menuNum = input.readLine();
         switch (menuNum) {
             case "1":   // 회원관리

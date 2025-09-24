@@ -1,6 +1,6 @@
 package exercise_v1.constant;
 
-public enum LoginMessage {
+public enum LoginPage {
 
     LOGIN_MENU_TITLE("""
             ---------------------<< 로그인 화면 >>-----------------------
@@ -37,11 +37,11 @@ public enum LoginMessage {
 
     private final String page;
 
-    LoginMessage(String page) {
+    LoginPage(String page) {
         this.page = page;
     }
 
-    public static void print(LoginMessage loginMenu) {
+    public static void print(LoginPage loginMenu) {
         System.out.printf(SUB_MENU_TITLE.toString(), loginMenu.page);
     }
 

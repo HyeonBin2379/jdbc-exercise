@@ -1,6 +1,6 @@
 package exercise_v1.controller;
 
-import exercise_v1.constant.LoginMessage;
+import exercise_v1.constant.LoginPage;
 import exercise_v1.domain.User;
 import exercise_v1.model.LoginDAO;
 
@@ -30,7 +30,7 @@ public class LoginMenu {
     public void loginMenu() {
         while (!quitLogin) {
             try {
-                System.out.print(LoginMessage.LOGIN_MENU_TITLE);
+                System.out.print(LoginPage.LOGIN_MENU_TITLE);
                 String menuNum = input.readLine();
                 switch (menuNum) {
                     case "1" -> login();
@@ -46,9 +46,9 @@ public class LoginMenu {
     }
 
     public void login() throws IOException {
-        System.out.println(LoginMessage.INPUT_ID);
+        System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
-        System.out.println(LoginMessage.INPUT_PWD);
+        System.out.println(LoginPage.INPUT_PWD);
         String userPwd = input.readLine();
 
         User loginUser = dao.login(userID, userPwd);
@@ -57,8 +57,8 @@ public class LoginMenu {
     }
 
     public void register() throws IOException {
-        LoginMessage.print(LoginMessage.SIGN_UP);
-        System.out.print(LoginMessage.INPUT_MEMBERSHIP_TYPE);
+        LoginPage.print(LoginPage.SIGN_UP);
+        System.out.print(LoginPage.INPUT_MEMBERSHIP_TYPE);
         String type = input.readLine();
 
         boolean ack = false;
@@ -81,21 +81,21 @@ public class LoginMenu {
     }
 
     public User inputMemberInfo() throws IOException {
-        LoginMessage.print(LoginMessage.MEMBER_REGISTER);
+        LoginPage.print(LoginPage.MEMBER_REGISTER);
 
-        System.out.println(LoginMessage.INPUT_ID);
+        System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
-        System.out.println(LoginMessage.INPUT_PWD);
+        System.out.println(LoginPage.INPUT_PWD);
         String userPwd = input.readLine();
-        System.out.println(LoginMessage.INPUT_COMPANY_NAME);
+        System.out.println(LoginPage.INPUT_COMPANY_NAME);
         String companyName = input.readLine();
-        System.out.println(LoginMessage.INPUT_PHONE);
+        System.out.println(LoginPage.INPUT_PHONE);
         String phone = input.readLine();
-        System.out.println(LoginMessage.INPUT_EMAIL);
+        System.out.println(LoginPage.INPUT_EMAIL);
         String email = input.readLine();
-        System.out.println(LoginMessage.INPUT_COMPANY_CODE);
+        System.out.println(LoginPage.INPUT_COMPANY_CODE);
         String companyCode = input.readLine();
-        System.out.println(LoginMessage.INPUT_ADDRESS);
+        System.out.println(LoginPage.INPUT_ADDRESS);
         String address = input.readLine();
 
         User newUser = new User(userID, userPwd, companyName, phone, email, "일반회원");
@@ -105,18 +105,18 @@ public class LoginMenu {
     }
 
     public User inputManagerInfo() throws IOException {
-        LoginMessage.print(LoginMessage.MEMBER_REGISTER);
-        System.out.println(LoginMessage.INPUT_ID);
+        LoginPage.print(LoginPage.MEMBER_REGISTER);
+        System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
-        System.out.println(LoginMessage.INPUT_PWD);
+        System.out.println(LoginPage.INPUT_PWD);
         String userPwd = input.readLine();
-        System.out.println(LoginMessage.INPUT_NAME);
+        System.out.println(LoginPage.INPUT_NAME);
         String name = input.readLine();
-        System.out.println(LoginMessage.INPUT_PHONE);
+        System.out.println(LoginPage.INPUT_PHONE);
         String phone = input.readLine();
-        System.out.println(LoginMessage.INPUT_EMAIL);
+        System.out.println(LoginPage.INPUT_EMAIL);
         String email = input.readLine();
-        System.out.println(LoginMessage.INPUT_MANAGER_POSITION);
+        System.out.println(LoginPage.INPUT_MANAGER_POSITION);
         String position = input.readLine();
 
         User newUser = new User(userID, userPwd, name, phone, email, position);
@@ -124,16 +124,16 @@ public class LoginMenu {
     }
 
     public void findID() throws IOException {
-        LoginMessage.print(LoginMessage.FIND_ID);
-        System.out.println(LoginMessage.INPUT_EMAIL);
+        LoginPage.print(LoginPage.FIND_ID);
+        System.out.println(LoginPage.INPUT_EMAIL);
         String userEmail = input.readLine();
 
         System.out.println(dao.findID(userEmail));
     }
 
     public void findPassword() throws IOException {
-        LoginMessage.print(LoginMessage.FIND_PWD);
-        System.out.println(LoginMessage.INPUT_ID);
+        LoginPage.print(LoginPage.FIND_PWD);
+        System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
 
         System.out.println(dao.findPassword(userID));
@@ -141,6 +141,6 @@ public class LoginMenu {
 
     public void exitLoginMenu() {
         quitLogin = true;
-        System.out.println(LoginMessage.EXIT_LOGIN_MENU);
+        System.out.println(LoginPage.EXIT_LOGIN_MENU);
     }
 }

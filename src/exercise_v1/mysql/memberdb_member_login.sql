@@ -258,3 +258,4 @@ call logout('wmscargoman', @result);
 call logout('wmsAdmin', @result);
 call logout('wmsmember', @result);
 select @result;
+commit;

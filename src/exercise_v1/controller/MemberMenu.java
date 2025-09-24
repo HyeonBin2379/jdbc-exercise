@@ -1,6 +1,6 @@
 package exercise_v1.controller;
 
-import exercise_v1.constant.MemberManagement;
+import exercise_v1.constant.MemberPage;
 import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
 import exercise_v1.model.MemberDAO;
@@ -19,8 +19,8 @@ public class MemberMenu {
     private boolean quitMenu;
 
     public MemberMenu(User loginUser) {
-        this.dao = new MemberDAO();
         this.user = loginUser;
+        this.dao = new MemberDAO();
         this.quitMenu = false;
     }
 
@@ -52,9 +52,9 @@ public class MemberMenu {
 
     public void printMenu() {
         if (user instanceof Member) {
-            System.out.println(MemberManagement.MEMBER_MEMBER_MENU_TITLE);
+            System.out.print(MemberPage.MEMBER_MEMBER_MENU_TITLE);
         } else {
-            System.out.println(MemberManagement.MANAGER_MEMBER_MENU_SEARCH);
+            System.out.print(MemberPage.MANAGER_MEMBER_MENU_TITLE);
         }
     }
 
@@ -72,6 +72,6 @@ public class MemberMenu {
 
     public void exitMenu() {
         quitMenu = true;
-        System.out.println(MemberManagement.MEMBER_MENU_PREVIOUS);
+        System.out.println(MemberPage.MEMBER_MENU_PREVIOUS);
     }
 }
