@@ -20,7 +20,7 @@ public class MemberManageMenu implements UserManageMenu {
         System.out.print(UserPage.MEMBER_MEMBER_MENU_TITLE);
     }
 
-    public void select() throws IOException {
+    public void read() throws IOException {
         // 일반회원이면 자신만 조회
         System.out.println(UserPage.CURRENT_USER_SELECT);
         dao.searchUserDetails();
@@ -76,11 +76,5 @@ public class MemberManageMenu implements UserManageMenu {
             System.out.println(e.getMessage());
         }
         return false;
-    }
-
-    public boolean exitMenu() {
-        boolean quitMenu = true;
-        System.out.println(UserPage.USER_MENU_PREVIOUS);
-        return quitMenu;
     }
 }

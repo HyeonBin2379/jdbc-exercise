@@ -22,36 +22,66 @@ public class ManagerManageMenu implements UserManageMenu {
     }
 
     @Override
-    public void select() throws IOException {
-        System.out.println(UserPage.MANAGER_SELECT_TITLE);
-        String menuNum = input.readLine();
-        switch (menuNum) {
-            case "1":
-                break;
-            case "2":
-                break;
-            case "3":
-                break;
-            case "4":
-                break;
+    public void read() throws IOException {
+        boolean quitRead = false;
+        while (!quitRead) {
+            System.out.println(UserPage.MANAGER_SELECT_TITLE);
+            String menuNum = input.readLine();
+            switch (menuNum) {
+                case "1":
+                    readOneUserDetail();
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    break;
+                case "4":
+                    quitRead = quit();
+                    break;
+            }
         }
     }
 
-    public void selectCurrentUser() {
+    public void readOneUserDetail() throws IOException {
+        boolean quitRead = false;
+        while (!quitRead) {
+            System.out.println(UserPage.MANAGER_DETAIL_INFO_TITLE);
+            String menuNum = input.readLine();
+            switch (menuNum) {
+                case "1":
+                    readCurrentUser();
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    quitRead = quit();
+                    break;
+            }
+        }
+    }
+    private void readCurrentUser() {
         System.out.println(UserPage.CURRENT_USER_SELECT);
+    }
+
+    private void readOtherUser() {
+
     }
 
     @Override
     public void update() throws IOException {
-        System.out.println(UserPage.MANAGER_UPDATE_TITLE);
-        String menuNum = input.readLine();
-        switch (menuNum) {
-            case "1":
-                break;
-            case "2":
-                break;
-            case "3":
-                break;
+        boolean quitUpdate = false;
+        while (!quitUpdate) {
+            System.out.println(UserPage.MANAGER_UPDATE_TITLE);
+            String menuNum = input.readLine();
+            switch (menuNum) {
+                case "1":
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    quitUpdate = quit();
+                    break;
+            }
         }
     }
 
@@ -80,26 +110,32 @@ public class ManagerManageMenu implements UserManageMenu {
 
     @Override
     public boolean delete() throws IOException {
-        System.out.println(UserPage.MANAGER_DELETE_TITLE);
-        String menuNum = input.readLine();
-        switch (menuNum) {
-            case "1":
-                break;
-            case "2":
-                break;
-            case "3":
-                break;
+        boolean quitDelete = false;
+        boolean isDeleted = false;
+        while (!quitDelete && !isDeleted) {
+            System.out.println(UserPage.MANAGER_DELETE_TITLE);
+            String menuNum = input.readLine();
+            switch (menuNum) {
+                case "1":
+                    isDeleted = deleteCurrentUser();
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+                    quitDelete = quit();
+                    break;
+            }
         }
+        return isDeleted;
+    }
+
+    private boolean deleteCurrentUser() {
         return false;
     }
 
-    private void deleteByManager() {
-
-    }
-
-    @Override
-    public boolean exitMenu() {
-        System.out.println();
+    private boolean quit() {
+        System.out.println(UserPage.USER_MENU_PREVIOUS);
         return true;
     }
 }

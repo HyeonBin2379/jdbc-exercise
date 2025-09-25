@@ -60,7 +60,7 @@ public class WMSMenu {
     }
 
     public void managerMenuList(Manager manager) throws IOException {
-        // 관리자 전용 기능이 존재하여 memberMenu(), managerMenu()를 구분
+        // 창고관리 기능은 관리자 전용 기능이므로, memberMenu(), managerMenu()를 구분
         System.out.print(WMSPage.MANAGER_MENU_TITLE);
         String menuNum = input.readLine();
         switch (menuNum) {
@@ -93,6 +93,8 @@ public class WMSMenu {
             quitWMS = userManageMenu.run();
         }
     }
+
+    // WMS의 나머지 주요 기능을 실행하기 위한 메서드를 여기서부터 작성해주시면 됩니다.
 
     public void logout(String userID) {
         LoginDAO.logout(userID);

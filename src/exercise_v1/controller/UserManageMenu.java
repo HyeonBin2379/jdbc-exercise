@@ -20,7 +20,7 @@ public interface UserManageMenu {
                 String menuNum = input.readLine();
                 switch (menuNum) {
                     case "1":
-                        select();
+                        read();
                         break;
                     case "2":
                         update();
@@ -49,7 +49,7 @@ public interface UserManageMenu {
 
     void update() throws IOException;
 
-    void select() throws IOException;
+    void read() throws IOException;
 
     void printMenu();
 }
