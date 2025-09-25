@@ -1,0 +1,55 @@
+package exercise_v1.controller;
+
+import exercise_v1.constant.UserPage;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public interface UserManageMenu {
+
+    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+    default boolean run() {
+        boolean quitMenu = false;
+        boolean isUserDeleted = false;
+
+        while (!quitMenu && !isUserDeleted) {
+            try {
+                printMenu();
+                String menuNum = input.readLine();
+                switch (menuNum) {
+                    case "1":
+                        select();
+                        break;
+                    case "2":
+                        update();
+                        break;
+                    case "3":
+                        isUserDeleted = delete();
+                        break;
+                    case "4":
+                        quitMenu = exitMenu();
+                        break;
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return isUserDeleted;
+    }
+
+    default boolean exitMenu() {
+        boolean quitMenu = true;
+        System.out.println(UserPage.USER_MENU_PREVIOUS);
+        return quitMenu;
+    }
+
+    boolean delete() throws IOException;
+
+    void update() throws IOException;
+
+    void select() throws IOException;
+
+    void printMenu();
+}

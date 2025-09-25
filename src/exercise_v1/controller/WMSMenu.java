@@ -17,7 +17,7 @@ public class WMSMenu {
     private final User currentLoginUser;
     private boolean quitWMS;
 
-    private UserMenu memberMenu;
+    private UserManageMenu userManageMenu;
 
     public WMSMenu(User loginUser) {
         this.currentLoginUser = loginUser;
@@ -43,7 +43,7 @@ public class WMSMenu {
         String menuNum = input.readLine();
         switch (menuNum) {
             case "1":   // 회원관리
-                memberManagement(member);
+                userManagement(member);
                 break;
             case "2":   // 고객센터
                 break;
@@ -65,7 +65,7 @@ public class WMSMenu {
         String menuNum = input.readLine();
         switch (menuNum) {
             case "1":   // 회원관리
-                memberManagement(manager);
+                userManagement(manager);
                 break;
             case "2":   // 고객센터
                 break;
@@ -83,10 +83,15 @@ public class WMSMenu {
         }
     }
 
-    public void memberManagement(User user) {
-        memberMenu = new UserMenu(user);
+    public void userManagement(User user) {
         // 회원 탈퇴 시 자동 종료
-        quitWMS = memberMenu.run();
+        if (user instanceof Manager manager) {
+            userManageMenu = new ManagerManageMenu(manager);
+            quitWMS = userManageMenu.run();
+        } else if (user instanceof Member member) {
+            userManageMenu = new MemberManageMenu(member);
+            quitWMS = userManageMenu.run();
+        }
     }
 
     public void logout(String userID) {
