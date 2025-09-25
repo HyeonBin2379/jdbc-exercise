@@ -119,24 +119,23 @@ public class LoginMenu {
         System.out.println(LoginPage.INPUT_MANAGER_POSITION);
         String position = input.readLine();
 
-        User newUser = new User(userID, userPwd, name, phone, email, position);
-        return newUser;
+        return new User(userID, userPwd, name, phone, email, position);
     }
 
     public void findID() throws IOException {
         LoginPage.print(LoginPage.FIND_ID);
         System.out.println(LoginPage.INPUT_EMAIL);
         String userEmail = input.readLine();
-
-        System.out.println(dao.findID(userEmail));
+        String foundID = dao.findID(userEmail);
+        System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
     }
 
     public void findPassword() throws IOException {
         LoginPage.print(LoginPage.FIND_PWD);
         System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
-
-        System.out.println(dao.findPassword(userID));
+        String foundPwd = dao.findPassword(userID);
+        System.out.printf(LoginPage.FOUND_PASSWORD.toString(), foundPwd);
     }
 
     public void exitLoginMenu() {

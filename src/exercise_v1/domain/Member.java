@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Member extends User {
 
     private String companyCode;
@@ -15,9 +16,6 @@ public class Member extends User {
     private boolean login;
     private Date start_date;
     private Date expired_date;
-
-    public Member() {
-    }
 
     public Member(String id, String pwd, String name, String phone, String email) {
         super(id, pwd, name, phone, email, "일반회원");

@@ -8,14 +8,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Manager extends User {
 
     private boolean login;
     private Date hireDate;
     private String position;
-
-    public Manager() {
-    }
 
     public Manager(String id, String pwd, String name, String phone, String email, String type) {
         super(id, pwd, name, phone, email, type);

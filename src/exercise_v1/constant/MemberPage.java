@@ -1,7 +1,7 @@
 package exercise_v1.constant;
 
 import exercise_v1.domain.Manager;
-import jdbc_members.vo.Member;
+import exercise_v1.domain.Member;
 
 public enum MemberPage {
 
@@ -89,11 +89,14 @@ public enum MemberPage {
     }
 
     public static void memberInfo(Member member) {
-
+        System.out.printf(MEMBER_DETAIL.toString(),
+                member.getId(), member.getPwd(), member.getName(),
+                member.getPhone(), member.getEmail(), member.getCompanyCode(),
+                member.getAddress(), member.getStart_date(), member.getExpired_date());
     }
 
     public static void managerInfo(Manager manager) {
-        System.out.printf(MEMBER_DETAIL.toString(),
+        System.out.printf(MANAGER_DETAIL.toString(),
                 manager.getId(), manager.getPwd(), manager.getName(),
                 manager.getPhone(), manager.getEmail(), manager.getHireDate(), manager.getType());
     }
