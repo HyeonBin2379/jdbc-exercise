@@ -310,6 +310,6 @@ DELIMITER ;
 call login_manager('wmscargoman', 'wms123456', '창고관리자');
 call logout('wmscargoman', @result);
 call logout('wmsAdmin', @result);
-call logout('wmsmember', @result);
+call logout('member12350', @result);
 select @result;
 commit;

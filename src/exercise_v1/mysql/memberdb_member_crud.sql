@@ -78,7 +78,7 @@ select * from users where user_id = 'wmsmember';
 -- 회원 정보가 삭제되면 해당 회원이 보유한 권한도 삭제된다.
 DROP PROCEDURE IF EXISTS member_delete;
 DELIMITER $$
-CREATE PROCEDURE member_delete(IN currentID varchar(15), OUT deleteCount boolean)
+CREATE PROCEDURE member_delete(IN currentID varchar(15), OUT deleteCount int)
 BEGIN
     -- 회원 정보 삭제: 삭제 시 해당 아이디로는 더 이상 로그인 불가
     SET @loginID = currentID;
@@ -94,21 +94,6 @@ BEGIN
     DEALLOCATE PREPARE deleteQuery;
     
     select count(member_id) into deleteCount from members where member_id = concat('del_', @loginID);
-END $$
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS manager_delete;
-DELIMITER $$
-CREATE PROCEDURE manager_delete(IN currentID varchar(15))
-BEGIN
-    -- 회원 정보 삭제: 삭제 시 아이디 중복으로 인해 미승인된 건까지 모두 삭제
-    SET @loginID = currentID;
-    
-    SET @deleteManager = 'delete from managers where manager_id = ? and manager_position != \'총관리자\'';
-    PREPARE deleteQuery FROM @deleteManager;
-    EXECUTE deleteQuery USING @loginID;
-    
-    DEALLOCATE PREPARE deleteQuery;
 END $$
 DELIMITER ;
 

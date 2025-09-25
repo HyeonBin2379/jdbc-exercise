@@ -68,9 +68,27 @@ call manager_update('wmscargoman', 'wms5678', '김철수', '010-4567-8910', 'wms
 select * from managers where manager_id = 'wmscargoman';
 select * from users where user_id = 'wmscargoman';
 
-
-
-
+DROP PROCEDURE IF EXISTS manager_delete;
+DELIMITER $$
+CREATE PROCEDURE manager_delete(IN currentID varchar(15), OUT deleteCount int)
+BEGIN
+    -- 회원 정보 삭제: 삭제 시 아이디 중복으로 인해 미승인된 건까지 모두 삭제
+    SET @loginID = currentID;
+    SET @deleteCount = 0;
+    
+    SET @deleteManager = 'update managers set manager_id = concat(\'del_\', ?), manager_login = false where manager_id = ? and manager_login = true';
+    PREPARE deleteQuery FROM @deleteManager;
+    EXECUTE deleteQuery USING @loginID, @loginID;
+    
+    SET @deleteInfo = 'delete from users where user_id = ?';
+    PREPARE deleteQuery FROM @deleteInfo;
+    EXECUTE deleteQuery USING @loginID;
+    
+    DEALLOCATE PREPARE deleteQuery;
+    
+    select count(manager_id) into deleteCount from managers where manager_id = concat('del_', @loginID);
+END $$
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS cargo_manager_search;
 DELIMITER $$
