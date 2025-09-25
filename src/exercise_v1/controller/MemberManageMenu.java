@@ -59,7 +59,7 @@ public class MemberManageMenu implements UserManageMenu {
 
     public boolean delete() {
         try {
-            System.out.println(UserPage.MEMBER_DELETE_TITLE);
+            System.out.println(UserPage.USER_DELETE_TITLE);
             String yesOrNo = input.readLine();
             if (!yesOrNo.equalsIgnoreCase("Y")) {
                 System.out.println(UserPage.MEMBER_NOT_DELETE);

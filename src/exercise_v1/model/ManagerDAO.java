@@ -8,6 +8,7 @@ import util.DBUtil;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
 
 public class ManagerDAO implements UserDAO {
 
@@ -51,6 +52,18 @@ public class ManagerDAO implements UserDAO {
 
     @Override
     public boolean deleteUserInfo() {
+        String sql = "{call manager_delete(?, ?)}";
+        try (Connection conn = DBUtil.getConnection();
+             CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, manager.getId());
+            call.setInt(2, Types.INTEGER);
+            call.execute();
+
+            int affected = call.getInt(2);
+            return affected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
         return false;
     }
 }
