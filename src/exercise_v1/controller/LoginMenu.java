@@ -36,7 +36,7 @@ public class LoginMenu {
                     case "1" -> login();
                     case "2" -> register();
                     case "3" -> findID();
-                    case "4" -> findPassword();
+                    case "4" -> updatePassword();
                     case "5" -> exitLoginMenu();
                 }
             } catch (IOException e) {
@@ -127,15 +127,32 @@ public class LoginMenu {
         System.out.println(LoginPage.INPUT_EMAIL);
         String userEmail = input.readLine();
         String foundID = dao.findID(userEmail);
-        System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
+
+        if (foundID != null) {
+            System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
+        } else {
+            System.out.println(LoginPage.NOT_FOUND_ID);
+        }
     }
 
-    public void findPassword() throws IOException {
+    public void updatePassword() throws IOException {
         LoginPage.print(LoginPage.FIND_PWD);
         System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
-        String foundPwd = dao.findPassword(userID);
-        System.out.printf(LoginPage.FOUND_PASSWORD.toString(), foundPwd);
+
+        if (!dao.isExistID(userID)) {
+            System.out.println(LoginPage.ID_NOT_EXIST);
+            return;
+        }
+        System.out.println(LoginPage.NEW_PASSWORD);
+        String newPassword = input.readLine();
+
+        boolean ack = dao.updatePassword(userID, newPassword);
+        if (ack) {
+            System.out.println(LoginPage.UPDATE_PASSWORD);
+        } else {
+            System.out.println(LoginPage.NOT_UPDATE_PASSWORD);
+        }
     }
 
     public void exitLoginMenu() {
