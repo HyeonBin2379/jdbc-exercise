@@ -103,6 +103,7 @@ public enum UserPage {
     INPUT_ID_FOR_DELETE_ROLE("권한을 삭제할 회원의 아이디를 입력해주세요."),
 
     NOT_HAVE_PERMISSION("해당 작업을 수행할 권한이 없습니다."),
+    CHIEF_MANAGER_CANNOT_DELETE("총관리자는 삭제할 수 없습니다."),
     USER_MENU_PREVIOUS("이전 메뉴로 돌아갑니다.");
 
     private final String page;

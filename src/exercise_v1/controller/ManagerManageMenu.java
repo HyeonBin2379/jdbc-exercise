@@ -3,6 +3,7 @@ package exercise_v1.controller;
 import exercise_v1.constant.LoginPage;
 import exercise_v1.constant.UserPage;
 import exercise_v1.domain.Manager;
+import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
 import exercise_v1.model.ManagerDAO;
 
@@ -66,12 +67,32 @@ public class ManagerManageMenu implements UserManageMenu {
     }
     private void readCurrentUser() {
         System.out.println(UserPage.CURRENT_USER_SELECT);
-        dao.searchUserDetails();
+        Manager manager = dao.searchUserDetails();
+        // 현재 관리자 정보 조회
+        UserPage.managerDetails(manager);
     }
 
     private void readOtherUser() throws IOException {
         System.out.println(UserPage.INPUT_ID_FOR_SEARCH);
         String targetID = input.readLine();
+        User found = dao.searchUser(targetID);
+
+        switch (currentManager.getPosition()) {
+            case "창고관리자":
+                if (found instanceof Manager) {
+                    System.out.println(UserPage.NOT_HAVE_PERMISSION);
+                    return;
+                }
+                UserPage.memberDetails((Member)found);
+                break;
+            case "총관리자":
+                if (found instanceof Manager manager) {
+                    UserPage.managerDetails(manager);
+                } else {
+                    UserPage.memberDetails((Member)found);
+                }
+                break;
+        }
     }
 
     // 권한에 관계없이 전체 회원 조회(승인된 회원의 공통 정보만 조회)
@@ -116,7 +137,6 @@ public class ManagerManageMenu implements UserManageMenu {
             System.out.println(UserPage.NOT_HAVE_PERMISSION);
             return;
         }
-
     }
 
     public User inputNewManager() throws IOException {
@@ -160,25 +180,26 @@ public class ManagerManageMenu implements UserManageMenu {
         return isDeleted;
     }
 
-    public boolean deleteCurrentUser() {
-        try {
-            System.out.print(UserPage.USER_DELETE_TITLE);
-            String yesOrNo = input.readLine();
-            if (!yesOrNo.equalsIgnoreCase("Y")) {
-                System.out.println(UserPage.USER_NOT_DELETE);
-                return false;
-            }
-
-            boolean ack = dao.deleteUserInfo();
-            if (ack) {
-                System.out.println(UserPage.USER_DELETE);
-                return true;
-            }
-            System.out.println(UserPage.USER_DELETE_FAILED);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+    public boolean deleteCurrentUser() throws IOException {
+        System.out.print(UserPage.USER_DELETE_TITLE);
+        if (currentManager.getPosition().equals("총관리자")) {  // 예외처리
+            System.out.println(UserPage.CHIEF_MANAGER_CANNOT_DELETE);
+            return false;
         }
-        return false;
+        String yesOrNo = input.readLine();
+        if (!yesOrNo.equalsIgnoreCase("Y")) {   // 예외처리
+            System.out.println(UserPage.USER_NOT_DELETE);
+            return false;
+        }
+
+        boolean ack = dao.deleteUserInfo();
+        if (!ack) {
+            // 예외처리
+            System.out.println(UserPage.USER_DELETE_FAILED);
+            return false;
+        }
+        System.out.println(UserPage.USER_DELETE);
+        return true;
     }
 
     public void deleteManagerRole() {

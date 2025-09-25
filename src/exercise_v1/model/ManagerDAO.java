@@ -1,6 +1,5 @@
 package exercise_v1.model;
 
-import exercise_v1.constant.UserPage;
 import exercise_v1.domain.Manager;
 import exercise_v1.domain.User;
 import util.DBUtil;
@@ -19,9 +18,8 @@ public class ManagerDAO implements UserDAO {
     }
 
     @Override
-    public void searchUserDetails() {
-        // 현재 관리자 정보 조회
-        UserPage.managerDetails(manager);
+    public Manager searchUserDetails() {
+        return manager;
     }
 
     @Override
@@ -65,5 +63,14 @@ public class ManagerDAO implements UserDAO {
             System.out.println(e.getMessage());
         }
         return false;
+    }
+
+    public User searchUser(String targetID) {
+        if (targetID.equals(manager.getId())) {
+            return searchUserDetails();
+        }
+        String sql = "{}";
+
+        return null;
     }
 }

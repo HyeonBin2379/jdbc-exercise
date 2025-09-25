@@ -23,7 +23,9 @@ public class MemberManageMenu implements UserManageMenu {
     public void read() throws IOException {
         // 일반회원이면 자신만 조회
         System.out.println(UserPage.CURRENT_USER_SELECT);
-        dao.searchUserDetails();
+        Member member = dao.searchUserDetails();
+        // 현재 회원 정보 조회
+        UserPage.memberDetails(member);
     }
 
     public void update() throws IOException {

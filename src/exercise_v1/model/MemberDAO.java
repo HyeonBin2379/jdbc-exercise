@@ -19,9 +19,8 @@ public class MemberDAO implements UserDAO {
     }
 
     @Override
-    public void searchUserDetails() {
-        // 현재 회원 정보 조회
-        UserPage.memberDetails(member);
+    public Member searchUserDetails() {
+        return member;
     }
 
     @Override
