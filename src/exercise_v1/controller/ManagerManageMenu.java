@@ -174,7 +174,7 @@ public class ManagerManageMenu implements UserManageMenu {
                 System.out.println(UserPage.USER_DELETE);
                 return true;
             }
-            System.out.println(UserPage.USER_NOT_DELETE);
+            System.out.println(UserPage.USER_DELETE_FAILED);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

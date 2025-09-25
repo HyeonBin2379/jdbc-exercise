@@ -62,16 +62,16 @@ public class MemberManageMenu implements UserManageMenu {
             System.out.println(UserPage.USER_DELETE_TITLE);
             String yesOrNo = input.readLine();
             if (!yesOrNo.equalsIgnoreCase("Y")) {
-                System.out.println(UserPage.MEMBER_NOT_DELETE);
+                System.out.println(UserPage.USER_NOT_DELETE);
                 return false;
             }
 
             boolean ack = dao.deleteUserInfo();
             if (ack) {
-                System.out.println(UserPage.MEMBER_DELETE);
+                System.out.println(UserPage.USER_DELETE);
                 return true;
             }
-            System.out.println(UserPage.MEMBER_NOT_DELETE);
+            System.out.println(UserPage.USER_DELETE_FAILED);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
