@@ -85,7 +85,6 @@ public class UserMenu {
             updateCurrentMember();
             return;
         }
-
     }
 
     public void updateCurrentMember() throws IOException {
@@ -127,9 +126,12 @@ public class UserMenu {
     }
 
     public void delete() {
+        isUserDeleted = true;
         if (dao instanceof MemberDAO) {
             // 일반회원인 경우, 회원탈퇴를 진행한다.
             deleteMember();
+        } else {
+
         }
     }
 

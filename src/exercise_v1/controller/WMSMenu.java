@@ -28,12 +28,9 @@ public class WMSMenu {
         while (!quitWMS) {
             try {
                 if (currentLoginUser instanceof Member member) {
-                    quitWMS = memberMenuList(member);
+                    memberMenuList(member);
                 } else if (currentLoginUser instanceof Manager manager) {
-                    quitWMS = managerMenuList(manager);
-                }
-                if (quitWMS) {
-                    break;
+                    managerMenuList(manager);
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -41,7 +38,7 @@ public class WMSMenu {
         }
     }
 
-    public boolean memberMenuList(Member member) throws IOException {
+    public void memberMenuList(Member member) throws IOException {
         System.out.print(WMSPage.MEMBER_MENU_TITLE);
         String menuNum = input.readLine();
         switch (menuNum) {
@@ -60,10 +57,9 @@ public class WMSMenu {
                 logout(member.getId());
                 break;
         }
-        return quitWMS;
     }
 
-    public boolean managerMenuList(Manager manager) throws IOException {
+    public void managerMenuList(Manager manager) throws IOException {
         // 관리자 전용 기능이 존재하여 memberMenu(), managerMenu()를 구분
         System.out.print(WMSPage.MANAGER_MENU_TITLE);
         String menuNum = input.readLine();
@@ -85,7 +81,6 @@ public class WMSMenu {
                 logout(manager.getId());
                 break;
         }
-        return quitWMS;
     }
 
     public void memberManagement(User user) {
