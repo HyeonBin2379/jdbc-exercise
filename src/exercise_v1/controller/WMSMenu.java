@@ -17,7 +17,7 @@ public class WMSMenu {
     private final User currentLoginUser;
     private boolean quitWMS;
 
-    private MemberMenu memberMenu;
+    private UserMenu memberMenu;
 
     public WMSMenu(User loginUser) {
         this.currentLoginUser = loginUser;
@@ -28,9 +28,12 @@ public class WMSMenu {
         while (!quitWMS) {
             try {
                 if (currentLoginUser instanceof Member member) {
-                    memberMenuList(member);
+                    quitWMS = memberMenuList(member);
                 } else if (currentLoginUser instanceof Manager manager) {
-                    managerMenuList(manager);
+                    quitWMS = managerMenuList(manager);
+                }
+                if (quitWMS) {
+                    break;
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -38,7 +41,7 @@ public class WMSMenu {
         }
     }
 
-    public void memberMenuList(Member member) throws IOException {
+    public boolean memberMenuList(Member member) throws IOException {
         System.out.print(WMSPage.MEMBER_MENU_TITLE);
         String menuNum = input.readLine();
         switch (menuNum) {
@@ -57,9 +60,10 @@ public class WMSMenu {
                 logout(member.getId());
                 break;
         }
+        return quitWMS;
     }
 
-    public void managerMenuList(Manager manager) throws IOException {
+    public boolean managerMenuList(Manager manager) throws IOException {
         // 관리자 전용 기능이 존재하여 memberMenu(), managerMenu()를 구분
         System.out.print(WMSPage.MANAGER_MENU_TITLE);
         String menuNum = input.readLine();
@@ -81,11 +85,13 @@ public class WMSMenu {
                 logout(manager.getId());
                 break;
         }
+        return quitWMS;
     }
 
     public void memberManagement(User user) {
-        memberMenu = new MemberMenu(user);
-        memberMenu.run();
+        memberMenu = new UserMenu(user);
+        // 회원 탈퇴 시 자동 종료
+        quitWMS = memberMenu.run();
     }
 
     public void logout(String userID) {

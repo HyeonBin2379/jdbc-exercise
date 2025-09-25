@@ -52,6 +52,9 @@ public class LoginMenu {
         String userPwd = input.readLine();
 
         User loginUser = dao.login(userID, userPwd);
+        if (loginUser == null) {
+            throw new IllegalStateException("계정이 존재하지 않습니다.");
+        }
         WMSMenu wmsMenu = new WMSMenu(loginUser);
         wmsMenu.run();
     }
@@ -74,9 +77,9 @@ public class LoginMenu {
         }
 
         if (ack) {
-            System.out.println("회원가입이 완료되었습니다.");
+            System.out.println(LoginPage.REGISTER_SUCCESS);
         } else {
-            System.out.println("회원가입에 실패했습니다.");
+            System.out.println(LoginPage.REGISTER_FAILED);
         }
     }
 

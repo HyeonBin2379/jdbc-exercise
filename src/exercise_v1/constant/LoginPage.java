@@ -34,6 +34,9 @@ public enum LoginPage {
             회원가입유형을 선택해주세요.
             """),
 
+    REGISTER_SUCCESS("회원가입이 완료되었습니다."),
+    REGISTER_FAILED("회원가입에 실패했습니다."),
+
     FOUND_ID("찾으시는 회원의 아이디는 %s입니다.\n"),
     NOT_FOUND_ID("입력한 이메일에 해당하는 아이디가 없습니다.\n"),
 
