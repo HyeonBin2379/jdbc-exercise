@@ -1,15 +1,20 @@
 package exercise_v1.model;
 
-public class MemberDAO {
+import exercise_v1.domain.User;
 
-    public MemberDAO() {
+public class UserDAO {
+
+    private User currentUser;
+
+    public UserDAO(User user) {
+        this.currentUser = user;
     }
 
-    public void selectLoginUser(String currentID) {
-
+    public void searchOneUser(String targetID) {
+        
     }
 
-    public void selectForManager() {
+    public void updateUser(String targetID) {
 
     }
 }
