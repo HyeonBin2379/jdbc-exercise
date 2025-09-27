@@ -2,7 +2,6 @@ package exercise_v1.constant.user;
 
 import exercise_v1.domain.user.Manager;
 import exercise_v1.domain.user.Member;
-import exercise_v1.domain.user.User;
 
 public enum UserPage {
 
@@ -75,10 +74,29 @@ public enum UserPage {
             계약종료일: %8$s
             """),
 
-    MANAGER_SEARCH_ALL("""
-            -----------------------------------<< 전체회원조회 >>-----------------------------------
+    SEARCH_COMMON_TITLE_FORMAT("""
+            -------------------------------------------------<< 전체 회원 리스트 >>------------------------------------------------
+            %s
+            --------------------------------------------------------------------------------------------------------------------
             """),
-    SEARCHED_COMMON_INFO("%-16s\t%-21s\t%-8s\t%-14s\t%-31s\t%-5s\n"),
+    SEARCH_COMMON_TITLE("%-13s\t%-19s\t%-9s\t\t%-12s\t%-27s\t\t%-7s\t"),
+    SEARCH_MEMBER_TITLE_FORMAT("""
+            --------------------------------------------------------------<< 일반회원 리스트 >>--------------------------------------------------------------------------------------------
+            %s
+            -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            """),
+    SEARCH_MEMBER_TITLE("%-9s\t%-9s\t\t%-9s\t%-10s\t"),
+    SEARCH_MANAGER_TITLE_FORMAT("""
+            ---------------------------------------------------------<< 관리자 리스트 >>-----------------------------------------------------------------
+            %s
+            -------------------------------------------------------------------------------------------------------------------------------------------
+            """),
+    SEARCH_MANAGER_TITLE("%-11s\t%-5s"),
+
+    SEARCHED_COMMON_INFO("%-16s\t%-20s\t%-12s\t%-12s\t\t%-30s\t%-8s\t"),
+    SEARCHED_MEMBER_INFO("%-11s\t%-9s\t\t%-12s\t%-12s"),
+    SEARCHED_MANAGER_INFO("%-12s\t%-8s"),
+
     MANAGER_SEARCH_BY_ROLE_TITLE("""
             -------------------<< 권한별 회원조회 >>--------------------
             1.일반회원 | 2.관리자
@@ -160,11 +178,19 @@ public enum UserPage {
                 manager.getEmail(), manager.getHireDate(), manager.getType());
     }
 
-    public static void userCommonInfoTitle() {
-        System.out.printf(SEARCHED_COMMON_INFO.toString(), "아이디", "비밀번호", "소속사/이름", "연락처", "이메일", "회원유형");
+    public static String searchAllTitle() {
+        return String.format(SEARCH_COMMON_TITLE_FORMAT.toString(), userCommonInfoTitle());
     }
-    public static void userCommonInfo(User user) {
-        System.out.printf(SEARCHED_COMMON_INFO.toString(), user.getId(), user.getPwd(), user.getName(), user.getPhone(), user.getEmail(), user.getType());
+    public static String userCommonInfoTitle() {
+        return String.format(SEARCH_COMMON_TITLE.toString(), "아이디", "비밀번호", "소속사/이름", "연락처", "이메일", "회원유형");
+    }
+    public static String memberInfoTitle() {
+        return String.format(SEARCH_MEMBER_TITLE_FORMAT.toString(),
+                userCommonInfoTitle() + String.format(SEARCH_MEMBER_TITLE.toString(), "사업자번호", "주소지", "계약체결일", "계약만료일"));
+    }
+    public static String managerInfoTitle() {
+        return String.format(SEARCH_MANAGER_TITLE_FORMAT.toString(),
+                userCommonInfoTitle() + String.format(SEARCH_MANAGER_TITLE.toString(), "입사일", "직급"));
     }
 
     @Override

@@ -114,16 +114,15 @@ public class ManagerManageMenu implements UserManageMenu {
 
     // 권한에 관계없이 전체 회원 조회(승인된 회원의 공통 정보만 조회)
     public void readAllUser() {
-        System.out.print(UserPage.MANAGER_SEARCH_ALL);
         if (!currentManager.getPosition().equals("총관리자")) {
             throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
         }
         allUsers = dao.searchAllUser();
 
-        UserPage.userCommonInfoTitle();
+        System.out.print(UserPage.searchAllTitle());
         allUsers.stream()
                 .sorted(Comparator.comparing(User::getType).reversed().thenComparing(User::getId))
-                .forEach(UserPage::userCommonInfo);
+                .forEach(System.out::println);
     }
 
     // 회원이 보유한 권한에 따라 회원 조회를 진행
@@ -140,9 +139,10 @@ public class ManagerManageMenu implements UserManageMenu {
     // 수정 필요
     public void readMemberList() {
         List<User> searchResult = dao.searchByRole("members");
+        System.out.print(UserPage.memberInfoTitle());
         searchResult.stream()
                 .map(user -> (Member)user)
-                .forEach(member -> System.out.println(member));
+                .forEach(System.out::println);
     }
 
     // 수정 필요
@@ -150,11 +150,12 @@ public class ManagerManageMenu implements UserManageMenu {
         if (!position.equals("총관리자")) {
             throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
         }
+        System.out.print(UserPage.managerInfoTitle());
         List<User> searchResult = dao.searchByRole("managers");
         searchResult.stream()
                 .map(user -> (Manager)user)
                 .sorted(Comparator.comparing(Manager::getPosition).reversed().thenComparing(Manager::getId))
-                .forEach(manager -> System.out.println(manager));
+                .forEach(System.out::println);
     }
 
     @Override

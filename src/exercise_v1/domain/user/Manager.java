@@ -1,5 +1,6 @@
 package exercise_v1.domain.user;
 
+import exercise_v1.constant.user.UserPage;
 import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,16 +22,7 @@ public class Manager extends User {
 
     @Override
     public String toString() {
-        return "Manager{" +
-                "id='" + getId() + '\'' +
-                ", pwd='" + getPwd() + '\'' +
-                ", name='" + getName() + '\'' +
-                ", phone='" + getPhone() + '\'' +
-                ", email='" + getEmail() + '\'' +
-                ", type='" + getType() + '\'' +
-                ", login=" + login +
-                ", hireDate=" + hireDate +
-                ", position='" + position + '\'' +
-                '}';
+        return super.toString()
+                + String.format(UserPage.SEARCHED_MANAGER_INFO.toString(), hireDate, position);
     }
 }
