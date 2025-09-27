@@ -1,15 +1,20 @@
 package exercise_v1.model;
 
+import exercise_v1.config.DBUtil;
+import exercise_v1.constant.LoginPage;
 import exercise_v1.domain.Manager;
 import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
-import util.DBUtil;
-
-import java.sql.*;
+import exercise_v1.exception.NotRegisteredUserException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 public class LoginDAO {
 
-    public String getUserType(String userID, String userPwd) throws SQLException {
+    public String searchUserTypeBy(String userID, String userPwd) throws SQLException {
         String sql = "{call get_user_type(?, ?, ?)}";
         String userType;
         try (Connection conn = DBUtil.getConnection();
@@ -26,12 +31,14 @@ public class LoginDAO {
 
     public User login(String userID, String userPwd) {
         try {
-            String userType = getUserType(userID, userPwd);
-            if (userType.contains("관리자")) {
-                return loginManager(userID, userPwd, userType);
-            } else {
-                return loginMember(userID, userPwd, userType);
+            String userType = searchUserTypeBy(userID, userPwd);
+            if (userType == null) {
+                throw new NotRegisteredUserException(LoginPage.USER_NOT_EXIST.toString());
             }
+            if (userType.endsWith("관리자")) {
+                return loginManager(userID, userPwd, userType);
+            }
+            return loginMember(userID, userPwd, userType);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

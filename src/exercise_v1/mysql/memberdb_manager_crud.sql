@@ -1,3 +1,4 @@
+use testdb1;
 ##########################################################
 # 2. 관리자 전용 회원관리 기능
 ##########################################################
@@ -74,29 +75,148 @@ CREATE PROCEDURE manager_delete(IN currentID varchar(15), OUT deleteCount int)
 BEGIN
     -- 회원 정보 삭제: 삭제 시 아이디 중복으로 인해 미승인된 건까지 모두 삭제
     SET @loginID = currentID;
+    SET @beforeDelete = 0;
     SET @deleteCount = 0;
+
+    select count(*) into @beforeDelete from managers where manager_login is null;
     
-    SET @deleteManager = 'update managers set manager_id = concat(\'del_\', ?), manager_login = false where manager_id = ? and manager_login = true';
+    SET @deleteManager = 'update managers set manager_login = null where manager_id = ? and manager_login = true';
     PREPARE deleteQuery FROM @deleteManager;
-    EXECUTE deleteQuery USING @loginID, @loginID;
+    EXECUTE deleteQuery USING @loginID;
     
-    SET @deleteInfo = 'delete from users where user_id = ?';
+    SET @deleteInfo = 'update from users set user_approval = \'삭제됨\',  where user_id = ? and user_approval = \'승인완료\'';
     PREPARE deleteQuery FROM @deleteInfo;
     EXECUTE deleteQuery USING @loginID;
     
     DEALLOCATE PREPARE deleteQuery;
     
-    select count(manager_id) into deleteCount from managers where manager_id = concat('del_', @loginID);
+    select count(manager_id) into @deleteCount from managers where manager_id = currentID and manager_login is null;
 END $$
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS cargo_manager_search;
+DROP PROCEDURE IF EXISTS other_user_type;
 DELIMITER $$
-CREATE PROCEDURE cargo_manager_search(IN targetID varchar(15), IN userType varchar(10))
+CREATE PROCEDURE other_user_type(IN targetID varchar(15), OUT userType varchar(10))
 BEGIN
-	-- 
-	if (userType like '창고관리자') then
-		select * from members;
-    end if;
+	select user_type into userType
+    from users
+    where user_id = targetID and user_approval = '승인완료';
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS search_other_member;
+DELIMITER $$
+CREATE PROCEDURE search_other_member(IN targetID varchar(15))
+BEGIN
+	set @targetID = targetID;
+    set @searchMember = 'select * from members where member_id = ?;';
+    
+    prepare selectQuery from @searchMember;
+    execute selectQuery using @targetID;
+    
+    deallocate prepare selectQuery;
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS search_other_manager;
+DELIMITER $$
+CREATE PROCEDURE search_other_manager(IN targetID varchar(15))
+BEGIN
+	set @targetID = targetID;
+    set @searchManager = 'select * from managers where manager_id = ?;';
+    
+    prepare selectQuery from @searchManager;
+    execute selectQuery using @targetID;
+    
+    deallocate prepare selectQuery;
+END $$
+DELIMITER ;
+commit;
+
+-- 승인된 모든 가입자의 정보 조회(관리자, 회원이 공통으로 보유한 정보만 간략히 출력)
+DROP PROCEDURE IF EXISTS search_all_users;
+DELIMITER $$
+CREATE PROCEDURE search_all_users()
+BEGIN
+	SET @approval = '승인완료';
+	SET @selectAll = 'select * from users where user_approval = ?';
+    
+    PREPARE selectAllQuery FROM @selectAll;
+    EXECUTE selectAllQuery USING @approval;
+    
+    DEALLOCATE PREPARE selectAllQuery;
+END $$
+DELIMITER ;
+
+call search_all_users();
+
+DROP PROCEDURE IF EXISTS search_by_role;
+DELIMITER $$
+CREATE PROCEDURE search_by_role(IN tableName varchar(10))
+BEGIN
+    SET @searchByRole = concat('select * from ', tableName);
+
+    PREPARE searchByRole FROM @searchByRole;
+    EXECUTE searchByRole;
+
+    DEALLOCATE PREPARE searchByRole;
+END $$
+DELIMITER ;
+
+-- 권한 수정은 아무 권한이 없는 회원을 대상으로 진행하며, 총관리자와 창고관리자 모두 수행할 수 있다.
+-- 즉, 회원의 권한을 다시 복구한다.
+-- 창고관리자는 일반회원 권한만 부여할 수 있다.
+DROP PROCEDURE IF EXISTS update_to_another_role;
+DELIMITER $$
+CREATE PROCEDURE update_to_another_role(IN targetID varchar(15), IN newRole varchar(10))
+BEGIN
+    SET @targetID = targetID;
+    SET @newRole = newRole;
+    SET @updateRole = 'update users set user_type = ? where user_id = ? and user_approval = \'승인완료\' and user_type is null';
+
+    PREPARE updateRole from @updateRole;
+    EXECUTE updateRole USING @newRole, @targetID, @previousRole;
+    DEALLOCATE PREPARE updateRole;
+
+    IF (newRole = '창고관리자') THEN
+        IF EXISTS (select manager_id from managers where manager_id = targetID) THEN
+            update managers set manager_position = newRole where manager_id = targetID;
+        ELSE
+            insert into managers
+            select user_id, user_pwd, user_name,
+                   user_phone, user_email, false, now(), newRole
+                       from users where user_id = targetID and user_approval = '승인완료';
+        END IF;
+    ELSEIF (newRole = '일반회원') THEN
+        IF EXISTS (select member_id from members where member_id = targetID) THEN
+            update managers set manager_position = newRole where manager_id = targetID;
+        ELSE
+            insert into members
+            select user_id, user_pwd, user_name,
+                   user_phone, user_email, user_company_code,
+                   user_address, false, now(), date_add(now(), interval 1 year)
+            from users where user_id = targetID and user_approval = '승인완료';
+        END IF;
+    END IF;
+END $$
+DELIMITER ;
+
+# 여기서부터 작업 수행 필요
+DROP PROCEDURE IF EXISTS delete_role;
+DELIMITER $$
+CREATE PROCEDURE delete_member_role(IN targetID varchar(15))
+BEGIN
+    SET @targetID = targetID;
+    SET @deleteRole = 'update members set member_login = null where member_id = ? and member_login = false';
+
+    PREPARE deleteRole FROM @deleteRole;
+    EXECUTE deleteRole USING @targetID;
+
+    SET @deleteRole = 'update users set user_type = null where user_id = ? and user_approval = \'승인완료\' and user_type = \'일반회원\'';
+
+    PREPARE deleteRole FROM @deleteRole;
+    EXECUTE deleteRole USING @targetID;
+
+    DEALLOCATE PREPARE deleteRole;
 END $$
 DELIMITER ;

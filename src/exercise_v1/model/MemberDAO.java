@@ -1,10 +1,8 @@
 package exercise_v1.model;
 
-import exercise_v1.constant.UserPage;
+import exercise_v1.config.DBUtil;
 import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
-import util.DBUtil;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,8 +12,8 @@ public class MemberDAO implements UserDAO {
 
     private final Member member;
 
-    public MemberDAO(Member member) {
-        this.member = member;
+    public MemberDAO(Member loginUser) {
+        this.member = loginUser;
     }
 
     @Override

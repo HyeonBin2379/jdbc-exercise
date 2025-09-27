@@ -1,3 +1,4 @@
+# use railway;
 use testdb1;
 
 #########################################################
@@ -106,6 +107,7 @@ BEGIN
 		user_id, user_approval, user_pwd, user_name, user_phone, user_email, 
 		user_company_code, user_address, user_join_date, user_type
 	) values(id, approval, pwd, name, phone, email, company_code, address, now(), register_type);
+	commit;
 END $$
 DELIMITER ;
 
@@ -224,6 +226,7 @@ BEGIN
     end if;
 END $$
 DELIMITER ;
+
 call has_userID('wmsAdmin', @result);
 select @result;
 
@@ -245,9 +248,9 @@ END $$
 DELIMITER ;
 
 -- 변경된 비밀번호를 members, managers 테이블에도 적용
-DROP TRIGGER IF EXISTS update_pwd_trigger;
+DROP TRIGGER IF EXISTS update_trigger;
 DELIMITER $$
-CREATE TRIGGER update_pwd_trigger
+CREATE TRIGGER update_trigger
 	AFTER UPDATE ON users
     FOR EACH ROW
 BEGIN
@@ -308,7 +311,7 @@ END $$
 DELIMITER ;
 
 call login_manager('wmscargoman', 'wms123456', '창고관리자');
-call logout('wmscargoman', @result);
+call logout('manager2', @result);
 call logout('wmsAdmin', @result);
 call logout('member12350', @result);
 select @result;

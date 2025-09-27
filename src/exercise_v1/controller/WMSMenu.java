@@ -5,7 +5,6 @@ import exercise_v1.domain.Manager;
 import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
 import exercise_v1.model.LoginDAO;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,9 +14,10 @@ public class WMSMenu {
     private static final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
     private final User currentLoginUser;
-    private boolean quitWMS;
 
+    private boolean quitWMS;
     private UserManageMenu userManageMenu;
+    //private CSMenu csMenu = new CSMenu();
 
     public WMSMenu(User loginUser) {
         this.currentLoginUser = loginUser;
@@ -46,6 +46,7 @@ public class WMSMenu {
                 userManagement(member);
                 break;
             case "2":   // 고객센터
+                //csMenu.csMenu();
                 break;
             case "3":   // 재고관리
                 break;
@@ -68,6 +69,7 @@ public class WMSMenu {
                 userManagement(manager);
                 break;
             case "2":   // 고객센터
+                //csMenu.csMenu();
                 break;
             case "3":   // 창고관리
                 break;
@@ -94,7 +96,9 @@ public class WMSMenu {
         }
     }
 
-    // WMS의 나머지 주요 기능을 실행하기 위한 메서드를 여기서부터 작성해주시면 됩니다.
+    // WMS의 나머지 기능에 관한 컨트롤러를 실행할 메서드를 여기서부터 작성해주시면 됩니다.
+
+
 
     public void logout(String userID) {
         LoginDAO.logout(userID);

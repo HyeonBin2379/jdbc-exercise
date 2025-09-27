@@ -1,6 +1,5 @@
 package exercise_v1.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +18,9 @@ public class User {
     protected String address;
     protected String type;
 
+    public User(String id, String pwd, String name, String phone, String email) {
+        this(id, pwd, name, phone, email, null);
+    }
     public User(String id, String pwd, String name, String phone, String email, String type) {
         this.id = id;
         this.pwd = pwd;
@@ -34,5 +36,17 @@ public class User {
             return this.id.equals(that.id);
         }
         throw new ClassCastException("비교할 수 없는 클래스 타입입니다.");
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

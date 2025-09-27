@@ -2,8 +2,11 @@ package exercise_v1.controller;
 
 import exercise_v1.constant.LoginPage;
 import exercise_v1.domain.User;
+import exercise_v1.exception.IDNotFoundException;
+import exercise_v1.exception.LoginException;
+import exercise_v1.exception.NotRegisteredUserException;
+import exercise_v1.exception.NotUpdatedPassword;
 import exercise_v1.model.LoginDAO;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,7 +42,7 @@ public class LoginMenu {
                     case "4" -> updatePassword();
                     case "5" -> exitLoginMenu();
                 }
-            } catch (IOException e) {
+            } catch (IOException | LoginException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -53,7 +56,7 @@ public class LoginMenu {
 
         User loginUser = dao.login(userID, userPwd);
         if (loginUser == null) {
-            throw new IllegalStateException("계정이 존재하지 않습니다.");
+            throw new LoginException(LoginPage.CANNOT_LOGIN.toString());
         }
         WMSMenu wmsMenu = new WMSMenu(loginUser);
         wmsMenu.run();
@@ -76,11 +79,10 @@ public class LoginMenu {
                 break;
         }
 
-        if (ack) {
-            System.out.println(LoginPage.REGISTER_SUCCESS);
-        } else {
-            System.out.println(LoginPage.REGISTER_FAILED);
+        if (!ack) {
+            throw new NotRegisteredUserException(LoginPage.REGISTER_FAILED.toString());
         }
+        System.out.println(LoginPage.REGISTER_SUCCESS);
     }
 
     public User inputMemberInfo() throws IOException {
@@ -131,11 +133,10 @@ public class LoginMenu {
         String userEmail = input.readLine();
         String foundID = dao.findID(userEmail);
 
-        if (foundID != null) {
-            System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
-        } else {
-            System.out.println(LoginPage.NOT_FOUND_ID);
+        if (foundID == null) {
+            throw new IDNotFoundException(LoginPage.NOT_FOUND_ID.toString());
         }
+        System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
     }
 
     public void updatePassword() throws IOException {
@@ -144,18 +145,16 @@ public class LoginMenu {
         String userID = input.readLine();
 
         if (!dao.isExistID(userID)) {
-            System.out.println(LoginPage.ID_NOT_EXIST);
-            return;
+            throw new IDNotFoundException(LoginPage.USER_NOT_EXIST.toString());
         }
         System.out.println(LoginPage.NEW_PASSWORD);
         String newPassword = input.readLine();
 
         boolean ack = dao.updatePassword(userID, newPassword);
-        if (ack) {
-            System.out.println(LoginPage.UPDATE_PASSWORD);
-        } else {
-            System.out.println(LoginPage.NOT_UPDATE_PASSWORD);
+        if (!ack) {
+            throw new NotUpdatedPassword(LoginPage.NOT_UPDATE_PASSWORD.toString());
         }
+        System.out.println(LoginPage.UPDATE_PASSWORD);
     }
 
     public void exitLoginMenu() {
