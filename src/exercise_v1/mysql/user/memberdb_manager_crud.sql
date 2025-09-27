@@ -204,6 +204,40 @@ CREATE TRIGGER update_to_member_trigger
     FOR EACH ROW
 BEGIN
     IF (OLD.user_type is null and NEW.user_type = '일반회원') THEN
+        IF EXISTS(select members.member_id
+                  from members where members.member_id = NEW.user_id) THEN
+
+            update members set member_login = false where member_id = NEW.user_id;
+        END IF;
+    END IF;
+END $$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS update_to_manager_trigger;
+DELIMITER $$
+CREATE TRIGGER update_to_manager_trigger
+    AFTER UPDATE ON users
+    FOR EACH ROW
+    FOLLOWS update_to_member_trigger
+BEGIN
+    IF (OLD.user_type is null and NEW.user_type = '창고관리자') THEN
+        IF EXISTS(select managers.manager_id
+                  from managers where managers.manager_id = NEW.user_id) THEN
+
+            update managers set manager_login = false, manager_position = NEW.user_type where manager_id = NEW.user_id;
+        END IF;
+    END IF;
+END $$
+DELIMITER ;
+
+
+DROP TRIGGER IF EXISTS update_to_member_trigger;
+DELIMITER $$
+CREATE TRIGGER update_to_member_trigger
+    AFTER UPDATE ON users
+    FOR EACH ROW
+BEGIN
+    IF (OLD.user_type is null and NEW.user_type = '일반회원') THEN
         insert into members     -- 새로운 권한을 부여
             select user_id, user_pwd, user_name,
                user_phone, user_email, user_company_code,
