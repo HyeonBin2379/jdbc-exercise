@@ -16,8 +16,8 @@ public enum UserPage {
     CURRENT_USER_SELECT("현재 회원정보를 조회합니다."),
 
     MEMBER_UPDATE_TITLE("--------------------<< 일반회원 회원정보 수정 >>--------------------------"),
-    MEMBER_UPDATE("현재 회원정보의 변경이 완료되었습니다."),
-    MEMBER_UPDATE_FAILED("현재 회원정보의 변경에 실패했습니다."),
+    USER_UPDATE("현재 회원정보의 변경이 완료되었습니다."),
+    USER_UPDATE_FAILED("현재 회원정보의 변경에 실패했습니다."),
 
     USER_DELETE_TITLE("""
             --------------------<< 회원탈퇴 >>--------------------------
@@ -86,7 +86,7 @@ public enum UserPage {
     MANAGER_SEARCH_MEMBERS(""),
     MANAGER_UPDATE_TITLE("""
             -------------------<< 관리자 전용 수정 >>------------------
-            1.내 정보 수정 | 2.회원 권한 부여 | 3.뒤로가기
+            1.내 정보 수정 | 2.회원 권한 부여 | 3.회원 복구 | 4.뒤로가기
             ---------------------------------------------------------
             메뉴를 선택해주세요.
             """),
@@ -102,8 +102,16 @@ public enum UserPage {
             ----------------------------------------------------------
             새로 부여할 권한을 선택해주세요.(1,2 중 택1)
             """),
+    ALREADY_HAVE_ROLE("이미 부여된 권한이 있는 회원입니다."),
     ROLE_UPDATE_COMPLETE("회원 권한 부여가 완료되었습니다."),
     ROLE_UPDATE_FAILED("회원 권한 부여를 수행하지 못했습니다."),
+
+    INPUT_ID_FOR_RESTORE("""
+            -------------------<< 회원 복구 >>--------------------
+            회원탈퇴를 철회할 회원의 아이디를 입력해주세요.
+            """),
+    RESTORE_COMPLETE("회원탈퇴 철회가 완료되었습니다."),
+    RESTORE_FAILED("이미 존재하는 회원입니다. 회원 복구를 진행할 수 없습니다."),
 
     MANAGER_DELETE_TITLE("""
             -------------------<< 관리자 전용 삭제 >>--------------------
@@ -125,7 +133,6 @@ public enum UserPage {
     ROLE_DELETE_FAILED("회원 권한 삭제를 완료하지 못했습니다."),
 
     NOT_HAVE_PERMISSION("권한이 낮아 해당 작업을 수행할 수 없습니다."),
-    ALREADY_HAVE_ROLE("이미 부여된 권한이 있는 회원입니다."),
     ALREADY_DELETED_ROLE("이미 권한이 삭제된 회원입니다."),
     CHIEF_MANAGER_CANNOT_DELETE("총관리자는 삭제할 수 없습니다."),
     USER_MENU_PREVIOUS("이전 메뉴로 돌아갑니다.");

@@ -18,18 +18,10 @@ public interface UserManageMenu {
                 printMenu();
                 String menuNum = input.readLine();
                 switch (menuNum) {
-                    case "1":
-                        read();
-                        break;
-                    case "2":
-                        update();
-                        break;
-                    case "3":
-                        hasLogout = delete();
-                        break;
-                    case "4":
-                        quitMenu = exitMenu();
-                        break;
+                    case "1" -> read();
+                    case "2" -> update();
+                    case "3" -> hasLogout = delete();
+                    case "4" -> quitMenu = exitMenu();
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());

@@ -7,9 +7,10 @@ import exercise_v1.domain.Member;
 import exercise_v1.domain.User;
 import exercise_v1.exception.DeleteException;
 import exercise_v1.exception.NotAvailableDeleteChiefManagerException;
+import exercise_v1.exception.NotAvailableUpdateChiefManagerException;
 import exercise_v1.exception.NotHavePermissionException;
 import exercise_v1.exception.NotRegisteredUserException;
-import exercise_v1.exception.NotUpdatedMemberException;
+import exercise_v1.exception.NotUpdatedUserException;
 import exercise_v1.exception.UpdateException;
 import exercise_v1.model.ManagerDAO;
 import java.io.IOException;
@@ -44,18 +45,10 @@ public class ManagerManageMenu implements UserManageMenu {
                 System.out.print(UserPage.MANAGER_SELECT_TITLE);
                 String menuNum = input.readLine();
                 switch (menuNum) {
-                    case "1":
-                        readOneUserDetail();
-                        break;
-                    case "2":
-                        readAllUser();
-                        break;
-                    case "3":
-                        readUsersByRole();
-                        break;
-                    case "4":
-                        quitRead = quit();
-                        break;
+                    case "1" -> readOneUserDetail();
+                    case "2" -> readAllUser();
+                    case "3" -> readUsersByRole();
+                    case "4" -> quitRead = quit();
                 }
             } catch (NotHavePermissionException | NotRegisteredUserException e) {
                 System.out.println(e.getMessage());
@@ -66,18 +59,16 @@ public class ManagerManageMenu implements UserManageMenu {
     public void readOneUserDetail() throws IOException {
         boolean quitRead = false;
         while (!quitRead) {
-            System.out.print(UserPage.MANAGER_DETAIL_INFO_TITLE);
-            String menuNum = input.readLine();
-            switch (menuNum) {
-                case "1":
-                    readCurrentUser();
-                    break;
-                case "2":
-                    readOtherUser();
-                    break;
-                case "3":
-                    quitRead = quit();
-                    break;
+            try {
+                System.out.print(UserPage.MANAGER_DETAIL_INFO_TITLE);
+                String menuNum = input.readLine();
+                switch (menuNum) {
+                    case "1" -> readCurrentUser();
+                    case "2" -> readOtherUser();
+                    case "3" -> quitRead = quit();
+                }
+            } catch (NotRegisteredUserException | NotHavePermissionException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -93,9 +84,12 @@ public class ManagerManageMenu implements UserManageMenu {
         String targetID = input.readLine();
 
         String userType = dao.searchUserTypeBy(targetID);
-        User found = dao.searchUser(targetID, userType);
+        if (userType == null) {
+            throw new NotRegisteredUserException("해당하는 회원을 찾을 수 없습니다.");
+        }
 
-        if (userType == null || found == null) {
+        User found = dao.searchUser(targetID, userType);
+        if (found == null) {
             throw new NotRegisteredUserException("해당하는 회원을 찾을 수 없습니다.");
         }
         switch (currentManager.getPosition()) {
@@ -136,15 +130,12 @@ public class ManagerManageMenu implements UserManageMenu {
         String menuNum = input.readLine();
 
         switch (menuNum) {
-            case "1":
-                readMemberList();
-                break;
-            case "2":
-                readManagerList(currentManager.getPosition());
-                break;
+            case "1" -> readMemberList();
+            case "2" -> readManagerList(currentManager.getPosition());
         }
     }
 
+    // 수정 필요
     public void readMemberList() {
         List<User> searchResult = dao.searchByRole("members");
         searchResult.stream()
@@ -152,6 +143,7 @@ public class ManagerManageMenu implements UserManageMenu {
                 .forEach(member -> System.out.println(member));
     }
 
+    // 수정 필요
     public void readManagerList(String position) {
         if (!position.equals("총관리자")) {
             throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
@@ -167,18 +159,21 @@ public class ManagerManageMenu implements UserManageMenu {
     public void update() throws IOException {
         boolean quitUpdate = false;
         while (!quitUpdate) {
-            System.out.print(UserPage.MANAGER_UPDATE_TITLE);
-            String menuNum = input.readLine();
-            switch (menuNum) {
-                case "1":
-                    updateCurrentManager();
-                    break;
-                case "2":
-                    updateUserRole();
-                    break;
-                case "3":
-                    quitUpdate = quit();
-                    break;
+            try {
+                System.out.print(UserPage.MANAGER_UPDATE_TITLE);
+                String menuNum = input.readLine();
+                switch (menuNum) {
+                    case "1" -> updateCurrentManager();
+                    case "2" -> updateUserRole();
+                    case "3" -> restoreUser();
+                    case "4" -> quitUpdate = quit();
+                }
+            } catch (NotAvailableUpdateChiefManagerException | NotUpdatedUserException e) {
+                System.out.println(e.getMessage());
+            } catch (NotHavePermissionException e) {
+                System.out.println(e.getMessage());
+            } catch (UpdateException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -187,13 +182,13 @@ public class ManagerManageMenu implements UserManageMenu {
         User newUserInfo = inputNewManager();
         boolean ack = dao.updateUserInfo(newUserInfo);
         if (!ack) {
-            throw new NotUpdatedMemberException(UserPage.MEMBER_UPDATE_FAILED.toString());
+            throw new NotUpdatedUserException(UserPage.USER_UPDATE_FAILED.toString());
         }
         currentManager.setPwd(newUserInfo.getPwd());
         currentManager.setName(newUserInfo.getName());
         currentManager.setPhone(newUserInfo.getPhone());
         currentManager.setEmail(newUserInfo.getEmail());
-        System.out.println(UserPage.MEMBER_UPDATE);
+        System.out.println(UserPage.USER_UPDATE);
     }
 
     public User inputNewManager() throws IOException {
@@ -218,28 +213,32 @@ public class ManagerManageMenu implements UserManageMenu {
     // 아무런 권한이 없는 회원에게 권한을 부여
     // 창고관리자는 일반회원 권한만 부여 가능
     public void updateUserRole() throws IOException {
-        System.out.println(UserPage.INPUT_ID_FOR_UPDATE_ROLE);
+        System.out.print(UserPage.INPUT_ID_FOR_UPDATE_ROLE);
         String targetID = input.readLine();
         String userType = dao.searchUserTypeBy(targetID);
         if (userType != null) {
             throw new UpdateException(UserPage.ALREADY_HAVE_ROLE.toString());
         }
 
-        System.out.println(UserPage.ROLE_UPDATE_OPTION);
+        System.out.print(UserPage.ROLE_UPDATE_OPTION);
         String option = input.readLine();
         boolean ack = false;
         switch (option) {
-            case "1":   // 일반회원 권한부여
+            case "1":
                 ack = dao.updateRole(targetID, "일반회원");
                 break;
-            case "2":   // 창고관리자 권한부여
+            case "2":
                 if (!currentManager.getPosition().equals("총관리자")) {
                     throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
                 }
-                ack = dao.updateRole(targetID, "창고관리자");
+                ack = dao.updateToManager(targetID, "창고관리자");
                 break;
         }
-        System.out.println(ack ? UserPage.ROLE_UPDATE_OPTION : UserPage.ROLE_UPDATE_FAILED);
+        System.out.println(ack ? UserPage.ROLE_UPDATE_COMPLETE : UserPage.ROLE_UPDATE_FAILED);
+    }
+
+    public void restoreUser() {
+
     }
 
     @Override
@@ -247,18 +246,25 @@ public class ManagerManageMenu implements UserManageMenu {
         boolean quitDelete = false;
         boolean isDeleted = false;
         while (!quitDelete && !isDeleted) {
-            System.out.println(UserPage.MANAGER_DELETE_TITLE);
-            String menuNum = input.readLine();
-            switch (menuNum) {
-                case "1":
-                    isDeleted = deleteCurrentUser();
-                    break;
-                case "2":
-                    deleteUserRole();
-                    break;
-                case "3":
-                    quitDelete = quit();
-                    break;
+            try {
+                System.out.print(UserPage.MANAGER_DELETE_TITLE);
+                String menuNum = input.readLine();
+                switch (menuNum) {
+                    case "1":
+                        if (currentManager.getPosition().equals("총관리자")) {
+                            throw new NotAvailableDeleteChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
+                        }
+                        isDeleted = deleteCurrentUser();
+                        break;
+                    case "2":
+                        deleteUserRole();
+                        break;
+                    case "3":
+                        quitDelete = quit();
+                        break;
+                }
+            } catch (NotAvailableDeleteChiefManagerException e) {
+                System.out.println(e.getMessage());
             }
         }
         return isDeleted;
@@ -266,15 +272,11 @@ public class ManagerManageMenu implements UserManageMenu {
 
     public boolean deleteCurrentUser() throws IOException {
         System.out.print(UserPage.USER_DELETE_TITLE);
-        if (currentManager.getPosition().equals("총관리자")) {  // 예외처리
-            throw new NotAvailableDeleteChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
-        }
         String yesOrNo = input.readLine();
         if (!yesOrNo.equalsIgnoreCase("Y")) {
             System.out.println(UserPage.USER_NOT_DELETE);
             return false;
         }
-
         boolean ack = dao.deleteUserInfo();
         if (!ack) {
             throw new DeleteException(UserPage.USER_DELETE_FAILED.toString());

@@ -30,7 +30,7 @@ public class MemberManageMenu implements UserManageMenu {
     public void update() throws IOException {
         User newUserInfo = inputNewMember();
         boolean ack = dao.updateUserInfo(newUserInfo);
-        System.out.println(ack ? UserPage.MEMBER_UPDATE : UserPage.MEMBER_UPDATE_FAILED);
+        System.out.println(ack ? UserPage.USER_UPDATE : UserPage.USER_UPDATE_FAILED);
     }
 
     private User inputNewMember() throws IOException {
@@ -60,7 +60,7 @@ public class MemberManageMenu implements UserManageMenu {
 
     public boolean delete() {
         try {
-            System.out.println(UserPage.USER_DELETE_TITLE);
+            System.out.print(UserPage.USER_DELETE_TITLE);
             String yesOrNo = input.readLine();
             if (!yesOrNo.equalsIgnoreCase("Y")) {
                 System.out.println(UserPage.USER_NOT_DELETE);

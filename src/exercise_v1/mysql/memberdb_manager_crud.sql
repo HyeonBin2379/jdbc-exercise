@@ -73,26 +73,26 @@ DROP PROCEDURE IF EXISTS manager_delete;
 DELIMITER $$
 CREATE PROCEDURE manager_delete(IN currentID varchar(15), OUT deleteCount int)
 BEGIN
-    -- 회원 정보 삭제: 삭제 시 아이디 중복으로 인해 미승인된 건까지 모두 삭제
+    -- 회원 정보 삭제: 삭제 시 해당 아이디로는 더 이상 로그인 불가
     SET @loginID = currentID;
-    SET @beforeDelete = 0;
-    SET @deleteCount = 0;
 
-    select count(*) into @beforeDelete from managers where manager_login is null;
-    
-    SET @deleteManager = 'update managers set manager_login = null where manager_id = ? and manager_login = true';
-    PREPARE deleteQuery FROM @deleteManager;
+    SET @deleteMember = 'update managers set manager_login = null where manager_id = ? and manager_login = true';
+    PREPARE deleteQuery FROM @deleteMember;
     EXECUTE deleteQuery USING @loginID;
-    
-    SET @deleteInfo = 'update from users set user_approval = \'삭제됨\',  where user_id = ? and user_approval = \'승인완료\'';
+
+    SET @deleteInfo = 'update users set user_approval = \'삭제됨\', user_type = null where user_id = ? and user_approval = \'승인완료\'';
     PREPARE deleteQuery FROM @deleteInfo;
     EXECUTE deleteQuery USING @loginID;
-    
+
     DEALLOCATE PREPARE deleteQuery;
-    
-    select count(manager_id) into @deleteCount from managers where manager_id = currentID and manager_login is null;
+
+    select count(manager_id) into deleteCount
+    from managers
+    where manager_id = currentID and manager_login is null;
+    commit;
 END $$
 DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS other_user_type;
 DELIMITER $$
@@ -163,45 +163,79 @@ BEGIN
 END $$
 DELIMITER ;
 
--- 권한 수정은 아무 권한이 없는 회원을 대상으로 진행하며, 총관리자와 창고관리자 모두 수행할 수 있다.
--- 즉, 회원의 권한을 다시 복구한다.
--- 창고관리자는 일반회원 권한만 부여할 수 있다.
-DROP PROCEDURE IF EXISTS update_to_another_role;
+# 회원 권한 부여(완료)
+-- 권한 부여는 아무 권한이 없는 회원을 대상으로 진행하며, 총관리자와 창고관리자 모두 수행할 수 있다.
+-- 단, 창고관리자는 일반회원 권한만 부여할 수 있다.
+DROP PROCEDURE IF EXISTS update_role;
 DELIMITER $$
-CREATE PROCEDURE update_to_another_role(IN targetID varchar(15), IN newRole varchar(10))
+CREATE PROCEDURE update_role(IN targetID varchar(15), IN newRole varchar(10), OUT updateCount INT)
 BEGIN
     SET @targetID = targetID;
     SET @newRole = newRole;
     SET @updateRole = 'update users set user_type = ? where user_id = ? and user_approval = \'승인완료\' and user_type is null';
 
     PREPARE updateRole from @updateRole;
-    EXECUTE updateRole USING @newRole, @targetID, @previousRole;
+    EXECUTE updateRole USING @newRole, @targetID;
     DEALLOCATE PREPARE updateRole;
 
-    IF (newRole = '창고관리자') THEN
-        IF EXISTS (select manager_id from managers where manager_id = targetID) THEN
-            update managers set manager_position = newRole where manager_id = targetID;
-        ELSE
-            insert into managers
-            select user_id, user_pwd, user_name,
-                   user_phone, user_email, false, now(), newRole
-                       from users where user_id = targetID and user_approval = '승인완료';
-        END IF;
-    ELSEIF (newRole = '일반회원') THEN
-        IF EXISTS (select member_id from members where member_id = targetID) THEN
-            update managers set manager_position = newRole where manager_id = targetID;
+    IF (newRole = '일반회원') THEN
+        select count(member_id) into updateCount
+        from members
+        where member_id = (
+            select user_id from users
+            where user_id = targetID and user_approval = '승인완료' and user_type = newRole
+        );
+    ELSEIF (newRole = '창고관리자') THEN
+        select count(manager_id) into updateCount
+        from managers
+        where manager_id = (
+            select user_id from users
+            where user_id = targetID and user_approval = '승인완료' and user_type = newRole
+        );
+    END IF;
+END $$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS update_to_member_trigger;
+DELIMITER $$
+CREATE TRIGGER update_to_member_trigger
+    AFTER UPDATE ON users
+    FOR EACH ROW
+BEGIN
+    IF (OLD.user_type is null and NEW.user_type = '일반회원') THEN
+        IF EXISTS (select member_id from members where member_id = NEW.user_id and member_login is null) THEN
+            update members set member_login = false where member_id = NEW.user_id and member_login is null;
         ELSE
             insert into members
             select user_id, user_pwd, user_name,
                    user_phone, user_email, user_company_code,
                    user_address, false, now(), date_add(now(), interval 1 year)
-            from users where user_id = targetID and user_approval = '승인완료';
+            from users where user_id = NEW.user_id and user_approval = '승인완료';
         END IF;
     END IF;
 END $$
 DELIMITER ;
 
-# 여기서부터 작업 수행 필요
+DROP TRIGGER IF EXISTS update_to_manager_trigger;
+DELIMITER $$
+CREATE TRIGGER update_to_manager_trigger
+    AFTER UPDATE ON users
+    FOR EACH ROW
+    FOLLOWS update_to_member_trigger
+BEGIN
+    IF (OLD.user_type is null and NEW.user_type = '창고관리자') THEN
+        IF EXISTS (select manager_id from managers where manager_id = NEW.user_id) THEN
+            update managers set manager_position = new.user_id, manager_login = false where manager_id = NEW.user_id and manager_login is null;
+        ELSE
+            insert into managers
+            select user_id, user_pwd, user_name,
+                   user_phone, user_email, false, now(), NEW.user_type
+            from users where user_id = NEW.user_type and user_approval = '승인완료';
+        END IF;
+    END IF;
+END $$
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS delete_role;
 DELIMITER $$
 CREATE PROCEDURE delete_member_role(IN targetID varchar(15))
@@ -212,7 +246,7 @@ BEGIN
     PREPARE deleteRole FROM @deleteRole;
     EXECUTE deleteRole USING @targetID;
 
-    SET @deleteRole = 'update users set user_type = null where user_id = ? and user_approval = \'승인완료\' and user_type = \'일반회원\'';
+    SET @deleteRole = 'update users set user_type = null, user_approval = \'삭제됨\' where user_id = ? and user_approval = \'승인완료\' and user_type = \'일반회원\'';
 
     PREPARE deleteRole FROM @deleteRole;
     EXECUTE deleteRole USING @targetID;
