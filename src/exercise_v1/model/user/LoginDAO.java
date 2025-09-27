@@ -163,15 +163,17 @@ public class LoginDAO {
     }
 
     public boolean updatePassword(String userID, String newPwd) {
-        String sql = "{call update_pwd(?, ?)}";
+        String sql = "{call update_pwd(?, ?, ?)}";
         try (Connection conn = DBUtil.getConnection();
              CallableStatement call = conn.prepareCall(sql)) {
             call.setString(1, userID);
             call.setString(2, newPwd);
+            call.registerOutParameter(3, Types.INTEGER);
 
             call.execute();
 
-            return true;
+            int affected = call.getInt(3);
+            return affected == 1;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

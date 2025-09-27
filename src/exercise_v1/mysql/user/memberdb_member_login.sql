@@ -299,12 +299,30 @@ CREATE PROCEDURE update_pwd(IN targetID varchar(15), IN newPwd varchar(20))
 BEGIN
 	set @targetID = targetID;
     set @newPwd = newPwd;
-    
+
     set @updatePwd = 'update users set user_pwd = ? where user_id = ? and user_approval = \'승인완료\'';
     prepare updateQuery from @updatePwd;
     execute updateQuery using @newPwd, @targetID;
-    
+
     deallocate prepare updateQuery;
+    commit;
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS update_pwd;
+DELIMITER $$
+CREATE PROCEDURE update_pwd(IN targetID varchar(15), IN newPwd varchar(20), OUT affected INT)
+BEGIN
+    set @targetID = targetID;
+    set @newPwd = newPwd;
+
+    set @updatePwd = 'update users set user_pwd = ? where user_id = ? and user_approval = \'승인완료\'';
+    prepare updateQuery from @updatePwd;
+    execute updateQuery using @newPwd, @targetID;
+
+    deallocate prepare updateQuery;
+
+    SELECT COUNT(user_id) INTO affected FROM users WHERE user_id = targetID AND user_pwd = newPwd;
     commit;
 END $$
 DELIMITER ;
