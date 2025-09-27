@@ -128,8 +128,12 @@ public class LoginMenu {
         System.out.println(LoginPage.INPUT_EMAIL);
         String email = input.readLine();
         System.out.println(LoginPage.INPUT_MANAGER_POSITION);
-        String position = input.readLine();
-
+        String option = input.readLine();
+        String position = null;
+        switch (option) {
+            case "1" -> position = "창고관리자";
+            case "2" -> position = "총관리자";
+        }
         return new User(userID, userPwd, name, phone, email, position);
     }
 
