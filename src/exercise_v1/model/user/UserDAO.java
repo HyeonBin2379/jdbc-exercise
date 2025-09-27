@@ -1,6 +1,6 @@
-package exercise_v1.model;
+package exercise_v1.model.user;
 
-import exercise_v1.domain.User;
+import exercise_v1.domain.user.User;
 
 public interface UserDAO {
 

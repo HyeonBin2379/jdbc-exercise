@@ -1,6 +1,6 @@
-package exercise_v1.controller;
+package exercise_v1.controller.user;
 
-import exercise_v1.constant.UserPage;
+import exercise_v1.constant.user.UserPage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

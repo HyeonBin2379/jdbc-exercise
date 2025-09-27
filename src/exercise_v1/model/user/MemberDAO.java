@@ -1,8 +1,8 @@
-package exercise_v1.model;
+package exercise_v1.model.user;
 
 import exercise_v1.config.DBUtil;
-import exercise_v1.domain.Member;
-import exercise_v1.domain.User;
+import exercise_v1.domain.user.Member;
+import exercise_v1.domain.user.User;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;

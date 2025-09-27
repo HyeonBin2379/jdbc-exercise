@@ -1,4 +1,4 @@
-package exercise_v1.domain;
+package exercise_v1.domain.user;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

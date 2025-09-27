@@ -1,12 +1,12 @@
-package exercise_v1.controller;
+package exercise_v1.controller.user;
 
-import exercise_v1.constant.LoginPage;
-import exercise_v1.domain.User;
-import exercise_v1.exception.IDNotFoundException;
-import exercise_v1.exception.LoginException;
-import exercise_v1.exception.NotRegisteredUserException;
-import exercise_v1.exception.NotUpdatedPassword;
-import exercise_v1.model.LoginDAO;
+import exercise_v1.constant.user.LoginPage;
+import exercise_v1.domain.user.User;
+import exercise_v1.exception.user.IDNotFoundException;
+import exercise_v1.exception.user.LoginException;
+import exercise_v1.exception.user.NotRegisteredUserException;
+import exercise_v1.exception.user.NotUpdatedPassword;
+import exercise_v1.model.user.LoginDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package exercise_v1.exception;
+package exercise_v1.exception.user;
 
 public class DeleteException extends RuntimeException {
 

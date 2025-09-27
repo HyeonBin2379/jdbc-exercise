@@ -1,4 +1,4 @@
-package exercise_v1.constant;
+package exercise_v1.constant.user;
 
 public enum LoginPage {
 

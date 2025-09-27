@@ -1,8 +1,8 @@
-package exercise_v1.constant;
+package exercise_v1.constant.user;
 
-import exercise_v1.domain.Manager;
-import exercise_v1.domain.Member;
-import exercise_v1.domain.User;
+import exercise_v1.domain.user.Manager;
+import exercise_v1.domain.user.Member;
+import exercise_v1.domain.user.User;
 
 public enum UserPage {
 

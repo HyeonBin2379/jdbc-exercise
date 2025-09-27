@@ -1,10 +1,10 @@
-package exercise_v1.controller;
+package exercise_v1.controller.user;
 
-import exercise_v1.constant.LoginPage;
-import exercise_v1.constant.UserPage;
-import exercise_v1.domain.Member;
-import exercise_v1.domain.User;
-import exercise_v1.model.MemberDAO;
+import exercise_v1.constant.user.LoginPage;
+import exercise_v1.constant.user.UserPage;
+import exercise_v1.domain.user.Member;
+import exercise_v1.domain.user.User;
+import exercise_v1.model.user.MemberDAO;
 import java.io.IOException;
 
 public class MemberManageMenu implements UserManageMenu {

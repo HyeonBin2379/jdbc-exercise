@@ -1,10 +1,10 @@
-package exercise_v1.controller;
+package exercise_v1.controller.user;
 
-import exercise_v1.constant.WMSPage;
-import exercise_v1.domain.Manager;
-import exercise_v1.domain.Member;
-import exercise_v1.domain.User;
-import exercise_v1.model.LoginDAO;
+import exercise_v1.constant.user.WMSPage;
+import exercise_v1.domain.user.Manager;
+import exercise_v1.domain.user.Member;
+import exercise_v1.domain.user.User;
+import exercise_v1.model.user.LoginDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

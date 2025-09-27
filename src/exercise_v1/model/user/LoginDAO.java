@@ -1,11 +1,11 @@
-package exercise_v1.model;
+package exercise_v1.model.user;
 
 import exercise_v1.config.DBUtil;
-import exercise_v1.constant.LoginPage;
-import exercise_v1.domain.Manager;
-import exercise_v1.domain.Member;
-import exercise_v1.domain.User;
-import exercise_v1.exception.NotRegisteredUserException;
+import exercise_v1.constant.user.LoginPage;
+import exercise_v1.domain.user.Manager;
+import exercise_v1.domain.user.Member;
+import exercise_v1.domain.user.User;
+import exercise_v1.exception.user.NotRegisteredUserException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;

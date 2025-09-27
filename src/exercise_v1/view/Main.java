@@ -1,6 +1,6 @@
 package exercise_v1.view;
 
-import exercise_v1.controller.LoginMenu;
+import exercise_v1.controller.user.LoginMenu;
 
 public class Main {
 
