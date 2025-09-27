@@ -1,5 +1,6 @@
 package exercise_v1.domain.user;
 
+import exercise_v1.constant.user.ManagerPage;
 import exercise_v1.constant.user.UserPage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

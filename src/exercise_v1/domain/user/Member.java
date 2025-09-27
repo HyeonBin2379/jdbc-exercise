@@ -1,6 +1,6 @@
 package exercise_v1.domain.user;
 
-import exercise_v1.constant.user.UserPage;
+import exercise_v1.constant.user.MemberPage;
 import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +24,6 @@ public class Member extends User {
     @Override
     public String toString() {
         return super.toString()
-                + String.format(UserPage.SEARCHED_MEMBER_INFO.toString(), companyCode, address, start_date, expired_date);
+                + String.format(MemberPage.SEARCHED_MEMBER_INFO.toString(), companyCode, address, start_date, expired_date);
     }
 }

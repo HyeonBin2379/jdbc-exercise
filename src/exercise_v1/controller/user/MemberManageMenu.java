@@ -1,6 +1,7 @@
 package exercise_v1.controller.user;
 
 import exercise_v1.constant.user.LoginPage;
+import exercise_v1.constant.user.MemberPage;
 import exercise_v1.constant.user.UserPage;
 import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
@@ -16,7 +17,7 @@ public class MemberManageMenu implements UserManageMenu {
     }
 
     public void printMenu() {
-        System.out.print(UserPage.MEMBER_MANAGEMENT_MENU_TITLE);
+        System.out.print(MemberPage.MEMBER_MANAGEMENT_MENU_TITLE);
     }
 
     public void read() throws IOException {
@@ -24,7 +25,7 @@ public class MemberManageMenu implements UserManageMenu {
         System.out.println(UserPage.CURRENT_USER_SELECT);
         Member member = dao.searchUserDetails();
         // 현재 회원 정보 조회
-        UserPage.memberDetails(member);
+        MemberPage.memberDetails(member);
     }
 
     public void update() throws IOException {
@@ -34,7 +35,7 @@ public class MemberManageMenu implements UserManageMenu {
     }
 
     private User inputNewMember() throws IOException {
-        System.out.println(UserPage.MEMBER_UPDATE_TITLE);
+        System.out.println(MemberPage.MEMBER_UPDATE_TITLE);
         System.out.println(LoginPage.INPUT_PWD);
         String userPwd = input.readLine();
         System.out.println(LoginPage.INPUT_COMPANY_NAME);
