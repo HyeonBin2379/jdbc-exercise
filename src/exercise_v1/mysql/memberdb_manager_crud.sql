@@ -173,6 +173,7 @@ BEGIN
     SET @targetID = targetID;
     SET @newRole = newRole;
     SET @updateRole = 'update users set user_type = ? where user_id = ? and user_approval = \'승인완료\' and user_type is null';
+    SET updateCount = 0;
 
     PREPARE updateRole from @updateRole;
     EXECUTE updateRole USING @newRole, @targetID;
@@ -203,15 +204,14 @@ CREATE TRIGGER update_to_member_trigger
     FOR EACH ROW
 BEGIN
     IF (OLD.user_type is null and NEW.user_type = '일반회원') THEN
-        IF EXISTS (select member_id from members where member_id = NEW.user_id and member_login is null) THEN
-            update members set member_login = false where member_id = NEW.user_id and member_login is null;
-        ELSE
-            insert into members
+        insert into members     -- 새로운 권한을 부여
             select user_id, user_pwd, user_name,
-                   user_phone, user_email, user_company_code,
-                   user_address, false, now(), date_add(now(), interval 1 year)
-            from users where user_id = NEW.user_id and user_approval = '승인완료';
-        END IF;
+               user_phone, user_email, user_company_code,
+               user_address, false, now(), date_add(now(), interval 1 year)
+            from users
+            where user_id = new.user_id and user_approval = '승인완료'
+        on duplicate key update  -- 이미 해당 아이디로 권한을 부여받은 적 있던 회원인 경우
+            member_login = false;
     END IF;
 END $$
 DELIMITER ;
@@ -224,14 +224,13 @@ CREATE TRIGGER update_to_manager_trigger
     FOLLOWS update_to_member_trigger
 BEGIN
     IF (OLD.user_type is null and NEW.user_type = '창고관리자') THEN
-        IF EXISTS (select manager_id from managers where manager_id = NEW.user_id) THEN
-            update managers set manager_position = new.user_id, manager_login = false where manager_id = NEW.user_id and manager_login is null;
-        ELSE
-            insert into managers
+        insert into managers
             select user_id, user_pwd, user_name,
                    user_phone, user_email, false, now(), NEW.user_type
-            from users where user_id = NEW.user_type and user_approval = '승인완료';
-        END IF;
+            from users
+            where user_id = NEW.user_id and user_approval = '승인완료'
+        on duplicate key update
+            manager_login = false, manager_position = NEW.user_type;
     END IF;
 END $$
 DELIMITER ;

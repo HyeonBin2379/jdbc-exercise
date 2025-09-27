@@ -204,22 +204,6 @@ public class ManagerDAO implements UserDAO {
         return false;
     }
 
-    public boolean updateToManager(String targetID, String newRole) {
-        String sql = "{call update_to_another_role(?, ?, ?)}";
-        try (Connection conn = DBUtil.getConnection();
-                CallableStatement call = conn.prepareCall(sql)) {
-            call.setString(1, targetID);
-            call.setString(2, newRole);
-
-            call.execute();
-
-            return true;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return false;
-    }
-
     public boolean deleteRole(String targetID, String newRole) {
         return false;
     }

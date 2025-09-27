@@ -107,7 +107,6 @@ BEGIN
 		user_id, user_approval, user_pwd, user_name, user_phone, user_email, 
 		user_company_code, user_address, user_join_date, user_type
 	) values(id, approval, pwd, name, phone, email, company_code, address, now(), register_type);
-	commit;
 END $$
 DELIMITER ;
 

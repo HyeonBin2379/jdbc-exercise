@@ -107,7 +107,8 @@ public class LoginDAO {
 
     public boolean register(User user) {
         String sql = "call register(?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBUtil.getConnection(); CallableStatement call = conn.prepareCall(sql)) {
+        try (Connection conn = DBUtil.getConnection();
+                CallableStatement call = conn.prepareCall(sql)) {
             call.setString(1, user.getId());
             call.setString(2, user.getPwd());
             call.setString(3, user.getName());
@@ -117,8 +118,9 @@ public class LoginDAO {
             call.setString(7, user.getAddress());
             call.setString(8, user.getType());
 
-            int affected = call.executeUpdate();
-            return affected > 0;
+            call.execute();
+
+            return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

@@ -231,7 +231,7 @@ public class ManagerManageMenu implements UserManageMenu {
                 if (!currentManager.getPosition().equals("총관리자")) {
                     throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
                 }
-                ack = dao.updateToManager(targetID, "창고관리자");
+                ack = dao.updateRole(targetID, "창고관리자");
                 break;
         }
         System.out.println(ack ? UserPage.ROLE_UPDATE_COMPLETE : UserPage.ROLE_UPDATE_FAILED);
