@@ -6,11 +6,11 @@ import exercise_v1.domain.user.Manager;
 import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
 import exercise_v1.exception.user.DeleteException;
-import exercise_v1.exception.user.NotAvailableDeleteChiefManagerException;
-import exercise_v1.exception.user.NotAvailableUpdateChiefManagerException;
-import exercise_v1.exception.user.NotHavePermissionException;
-import exercise_v1.exception.user.NotRegisteredUserException;
-import exercise_v1.exception.user.NotUpdatedUserException;
+import exercise_v1.exception.user.UserNotAvailableDeleteChiefManagerException;
+import exercise_v1.exception.user.UserNotAvailableUpdateChiefManagerException;
+import exercise_v1.exception.user.UserNotHavePermissionException;
+import exercise_v1.exception.user.UserNotRegisteredException;
+import exercise_v1.exception.user.UserNotUpdatedException;
 import exercise_v1.exception.user.UpdateException;
 import exercise_v1.exception.user.UserNotApprovedException;
 import exercise_v1.exception.user.UserNotRestoredException;
@@ -36,7 +36,7 @@ public class ManagerManageMenu implements UserManageMenu {
 
     @Override
     public void printMenu() {
-        System.out.print(UserPage.MANAGER_MEMBER_MENU_TITLE);
+        System.out.print(UserPage.MANAGER_MANAGEMENT_MENU_TITLE);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ManagerManageMenu implements UserManageMenu {
                     case "3" -> readUsersByRole();
                     case "4" -> quitRead = quit();
                 }
-            } catch (NotHavePermissionException | NotRegisteredUserException e) {
+            } catch (UserNotHavePermissionException | UserNotRegisteredException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -69,7 +69,7 @@ public class ManagerManageMenu implements UserManageMenu {
                     case "2" -> readOtherUser();
                     case "3" -> quitRead = quit();
                 }
-            } catch (NotRegisteredUserException | NotHavePermissionException e) {
+            } catch (UserNotRegisteredException | UserNotHavePermissionException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -87,18 +87,18 @@ public class ManagerManageMenu implements UserManageMenu {
 
         String userType = dao.searchUserTypeBy(targetID);
         if (userType == null) {
-            throw new NotRegisteredUserException("해당하는 회원을 찾을 수 없습니다.");
+            throw new UserNotRegisteredException("해당하는 회원을 찾을 수 없습니다.");
         }
 
         User found = dao.searchUser(targetID, userType);
         if (found == null) {
-            throw new NotRegisteredUserException("해당하는 회원을 찾을 수 없습니다.");
+            throw new UserNotRegisteredException("해당하는 회원을 찾을 수 없습니다.");
         }
         switch (currentManager.getPosition()) {
             case "창고관리자":
                 if (found instanceof Manager) {
                     // 창고관리자는 다른 창고관리자의 인적사항을 열람할 수 없다.
-                    throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+                    throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
                 }
                 UserPage.memberDetails((Member)found);
                 break;
@@ -116,7 +116,7 @@ public class ManagerManageMenu implements UserManageMenu {
     public void readAllUser() {
         System.out.print(UserPage.MANAGER_SEARCH_ALL);
         if (!currentManager.getPosition().equals("총관리자")) {
-            throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+            throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
         }
         allUsers = dao.searchAllUser();
 
@@ -148,7 +148,7 @@ public class ManagerManageMenu implements UserManageMenu {
     // 수정 필요
     public void readManagerList(String position) {
         if (!position.equals("총관리자")) {
-            throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+            throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
         }
         List<User> searchResult = dao.searchByRole("managers");
         searchResult.stream()
@@ -171,7 +171,7 @@ public class ManagerManageMenu implements UserManageMenu {
                     case "4" -> restoreUser();
                     case "5" -> quitUpdate = quit();
                 }
-            } catch (NotUpdatedUserException | UpdateException | NotHavePermissionException e) {
+            } catch (UserNotUpdatedException | UpdateException | UserNotHavePermissionException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -181,7 +181,7 @@ public class ManagerManageMenu implements UserManageMenu {
         User newUserInfo = inputNewManager();
         boolean ack = dao.updateUserInfo(newUserInfo);
         if (!ack) {
-            throw new NotUpdatedUserException(UserPage.USER_UPDATE_FAILED.toString());
+            throw new UserNotUpdatedException(UserPage.USER_UPDATE_FAILED.toString());
         }
         currentManager.setPwd(newUserInfo.getPwd());
         currentManager.setName(newUserInfo.getName());
@@ -238,7 +238,7 @@ public class ManagerManageMenu implements UserManageMenu {
                 break;
             case "2":
                 if (!currentManager.getPosition().equals("총관리자")) {
-                    throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+                    throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
                 }
                 ack = dao.updateRole(targetID, "창고관리자");
                 break;
@@ -267,7 +267,7 @@ public class ManagerManageMenu implements UserManageMenu {
                 switch (menuNum) {
                     case "1":
                         if (currentManager.getPosition().equals("총관리자")) {
-                            throw new NotAvailableDeleteChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
+                            throw new UserNotAvailableDeleteChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
                         }
                         isDeleted = deleteCurrentUser();
                         break;
@@ -278,8 +278,8 @@ public class ManagerManageMenu implements UserManageMenu {
                         quitDelete = quit();
                         break;
                 }
-            } catch (NotAvailableDeleteChiefManagerException
-                     | NotAvailableUpdateChiefManagerException
+            } catch (UserNotAvailableDeleteChiefManagerException
+                     | UserNotAvailableUpdateChiefManagerException
                      | DeleteException e) {
                 System.out.println(e.getMessage());
             }
@@ -314,17 +314,17 @@ public class ManagerManageMenu implements UserManageMenu {
             throw new DeleteException(UserPage.ALREADY_DELETED_ROLE.toString());
         }
         if (targetType.equals("총관리자")) {
-            throw new NotAvailableUpdateChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
+            throw new UserNotAvailableUpdateChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
         }
         if (!currentManager.getPosition().equals("총관리자") && targetType.equals("창고관리자")) {
-            throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+            throw new UserNotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
         }
         boolean ack = dao.deleteRole(targetID, targetType);
         System.out.println(ack ? UserPage.ROLE_DELETE_COMPLETE : UserPage.ROLE_DELETE_FAILED);
     }
 
     private boolean quit() {
-        System.out.println(UserPage.USER_MENU_PREVIOUS);
+        System.out.println(UserPage.TO_PREVIOUS_MENU);
         return true;
     }
 }

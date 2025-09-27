@@ -5,7 +5,7 @@ import exercise_v1.constant.user.LoginPage;
 import exercise_v1.domain.user.Manager;
 import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
-import exercise_v1.exception.user.NotRegisteredUserException;
+import exercise_v1.exception.user.UserNotRegisteredException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,7 +33,7 @@ public class LoginDAO {
         try {
             String userType = searchUserTypeBy(userID, userPwd);
             if (userType == null) {
-                throw new NotRegisteredUserException(LoginPage.USER_NOT_EXIST.toString());
+                throw new UserNotRegisteredException(LoginPage.USER_NOT_EXIST.toString());
             }
             if (userType.endsWith("관리자")) {
                 return loginManager(userID, userPwd, userType);

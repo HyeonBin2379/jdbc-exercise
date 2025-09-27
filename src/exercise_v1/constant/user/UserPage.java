@@ -6,8 +6,7 @@ import exercise_v1.domain.user.User;
 
 public enum UserPage {
 
-    // 일반회원, 관리자 공통 기능
-    MEMBER_MEMBER_MENU_TITLE("""
+    MEMBER_MANAGEMENT_MENU_TITLE("""
             ------------------<< 일반회원 회원관리 >>------------------
             1.내 정보 조회 | 2.내 정보 수정 | 3.탈퇴 | 4.뒤로가기
             ---------------------------------------------------------
@@ -16,6 +15,10 @@ public enum UserPage {
     CURRENT_USER_SELECT("현재 회원정보를 조회합니다."),
 
     MEMBER_UPDATE_TITLE("--------------------<< 일반회원 회원정보 수정 >>--------------------------"),
+    USER_UPDATE_TITLE("""
+            --------------------<< 회원정보 수정 >>--------------------------
+            현재 회원정보를 변경하시겠습니까?(Y 입력 시 진행)
+            """),
     USER_UPDATE("현재 회원정보의 변경이 완료되었습니다."),
     USER_UPDATE_FAILED("현재 회원정보의 변경에 실패했습니다."),
 
@@ -29,7 +32,7 @@ public enum UserPage {
 
 
     // 관리자 전용 회원관리 기능
-    MANAGER_MEMBER_MENU_TITLE("""
+    MANAGER_MANAGEMENT_MENU_TITLE("""
             -------------------<< 관리자 회원관리 >>-------------------
             1.회원 조회 | 2.회원 수정 | 3.회원 삭제 | 4.뒤로가기
             ---------------------------------------------------------
@@ -136,7 +139,7 @@ public enum UserPage {
     NOT_HAVE_PERMISSION("권한이 낮아 해당 작업을 수행할 수 없습니다."),
     ALREADY_DELETED_ROLE("이미 권한이 삭제된 회원입니다."),
     CHIEF_MANAGER_CANNOT_DELETE("총관리자는 삭제할 수 없습니다."),
-    USER_MENU_PREVIOUS("이전 메뉴로 돌아갑니다.");
+    TO_PREVIOUS_MENU("이전 메뉴로 돌아갑니다.");
 
     private final String page;
 

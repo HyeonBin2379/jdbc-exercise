@@ -16,7 +16,7 @@ public class MemberManageMenu implements UserManageMenu {
     }
 
     public void printMenu() {
-        System.out.print(UserPage.MEMBER_MEMBER_MENU_TITLE);
+        System.out.print(UserPage.MEMBER_MANAGEMENT_MENU_TITLE);
     }
 
     public void read() throws IOException {

@@ -2,10 +2,10 @@ package exercise_v1.controller.user;
 
 import exercise_v1.constant.user.LoginPage;
 import exercise_v1.domain.user.User;
-import exercise_v1.exception.user.IDNotFoundException;
+import exercise_v1.exception.user.UserIDNotFoundException;
 import exercise_v1.exception.user.LoginException;
-import exercise_v1.exception.user.NotRegisteredUserException;
-import exercise_v1.exception.user.NotUpdatedPassword;
+import exercise_v1.exception.user.UserNotRegisteredException;
+import exercise_v1.exception.user.UserNotUpdatedException;
 import exercise_v1.model.user.LoginDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,23 +64,29 @@ public class LoginMenu {
 
     public void register() throws IOException {
         LoginPage.print(LoginPage.SIGN_UP);
+        System.out.print(LoginPage.REGISTER_OR_NOT);
+        String yesOrNo = input.readLine();
+        if (!yesOrNo.equalsIgnoreCase("Y")) {
+            System.out.println(LoginPage.TO_PREVIOUS_MENU);
+            return;
+        }
+
         System.out.print(LoginPage.INPUT_MEMBERSHIP_TYPE);
         String type = input.readLine();
-
         boolean ack = false;
         switch (type) {
-            case "1":
+            case "1" -> {
                 User newMember = inputMemberInfo();
                 ack = dao.register(newMember);
-                break;
-            case "2":
+            }
+            case "2" -> {
                 User newManager = inputManagerInfo();
                 ack = dao.register(newManager);
-                break;
+            }
         }
 
         if (!ack) {
-            throw new NotRegisteredUserException(LoginPage.REGISTER_FAILED.toString());
+            throw new UserNotRegisteredException(LoginPage.REGISTER_FAILED.toString());
         }
         System.out.println(LoginPage.REGISTER_SUCCESS);
     }
@@ -110,7 +116,7 @@ public class LoginMenu {
     }
 
     public User inputManagerInfo() throws IOException {
-        LoginPage.print(LoginPage.MEMBER_REGISTER);
+        LoginPage.print(LoginPage.MANAGER_REGISTER);
         System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
         System.out.println(LoginPage.INPUT_PWD);
@@ -134,7 +140,7 @@ public class LoginMenu {
         String foundID = dao.findID(userEmail);
 
         if (foundID == null) {
-            throw new IDNotFoundException(LoginPage.NOT_FOUND_ID.toString());
+            throw new UserIDNotFoundException(LoginPage.NOT_FOUND_ID.toString());
         }
         System.out.printf(LoginPage.FOUND_ID.toString(), foundID);
     }
@@ -145,14 +151,14 @@ public class LoginMenu {
         String userID = input.readLine();
 
         if (!dao.isExistID(userID)) {
-            throw new IDNotFoundException(LoginPage.USER_NOT_EXIST.toString());
+            throw new UserIDNotFoundException(LoginPage.USER_NOT_EXIST.toString());
         }
         System.out.println(LoginPage.NEW_PASSWORD);
         String newPassword = input.readLine();
 
         boolean ack = dao.updatePassword(userID, newPassword);
         if (!ack) {
-            throw new NotUpdatedPassword(LoginPage.NOT_UPDATE_PASSWORD.toString());
+            throw new UserNotUpdatedException(LoginPage.NOT_UPDATE_PASSWORD.toString());
         }
         System.out.println(LoginPage.UPDATE_PASSWORD);
     }

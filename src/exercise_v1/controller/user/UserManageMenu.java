@@ -32,7 +32,7 @@ public interface UserManageMenu {
 
     default boolean exitMenu() {
         boolean quitMenu = true;
-        System.out.println(UserPage.USER_MENU_PREVIOUS);
+        System.out.println(UserPage.TO_PREVIOUS_MENU);
         return quitMenu;
     }
 
