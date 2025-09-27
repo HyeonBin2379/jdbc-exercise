@@ -235,21 +235,78 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- 회원 승인: 승인완료된 계정이 없으면,
+DROP PROCEDURE IF EXISTS approve_user;
+DELIMITER $$
+CREATE PROCEDURE approve_user(IN targetID varchar(15), OUT affected INT)
+BEGIN
+   IF NOT EXISTS(select user_id
+                 from users
+                 where user_id = targetID and user_approval = '승인완료') THEN
+       update users set user_approval = '승인완료' where user_id = targetID and user_approval = '미승인';
+       SET affected = 1;
+   ELSE
+       SET affected = 0;
+   END IF;
+END $$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS grant_role_trigger;
+DELIMITER $$
+CREATE TRIGGER grant_role_trigger
+    AFTER UPDATE ON users FOR EACH ROW
+BEGIN
+    IF (old.user_approval = '미승인' and new.user_approval = '승인완료') then
+        IF (new.user_type = '일반회원') THEN
+            insert into members
+            values(
+                      new.user_id, new.user_pwd, new.user_name, new.user_phone,
+                      new.user_email, new.user_company_code, new.user_address,
+                      false, now(), date_add(now(), interval 1 year)
+            );
+-- 가입승인된 회원의 가입유형이 창고관리자 또는 총관리자면 관리자 권한을 부여
+        ELSEIF (new.user_type like '%관리자') then
+            insert into managers
+            values(
+                      new.user_id, new.user_pwd, new.user_name, new.user_phone,
+                      new.user_email, false, now(), new.user_type
+            );
+        END IF;
+    END IF;
+END $$
+DELIMITER ;
+commit;
+
+-- 회원탈퇴 철회: 삭제된 회원을 승인완료 상태로 복구(단, 권한은 복구되지 않음)
+DROP PROCEDURE IF EXISTS restore_user;
+DELIMITER $$
+CREATE PROCEDURE restore_user(IN targetID varchar(15), OUT affected INT)
+BEGIN
+    IF NOT EXISTS(select user_id
+                  from users
+                  where user_id = targetID and user_approval = '승인완료') THEN
+        update users set user_approval = '승인완료' where user_id = targetID and user_approval = '삭제됨';
+        SET affected = 1;
+    ELSE
+        SET affected = 0;
+    END IF;
+END $$
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS delete_role;
 DELIMITER $$
-CREATE PROCEDURE delete_member_role(IN targetID varchar(15))
+CREATE PROCEDURE delete_role(IN targetID varchar(15), IN targetType varchar(10), OUT affected INT)
 BEGIN
-    SET @targetID = targetID;
-    SET @deleteRole = 'update members set member_login = null where member_id = ? and member_login = false';
-
-    PREPARE deleteRole FROM @deleteRole;
-    EXECUTE deleteRole USING @targetID;
-
-    SET @deleteRole = 'update users set user_type = null, user_approval = \'삭제됨\' where user_id = ? and user_approval = \'승인완료\' and user_type = \'일반회원\'';
-
-    PREPARE deleteRole FROM @deleteRole;
-    EXECUTE deleteRole USING @targetID;
-
-    DEALLOCATE PREPARE deleteRole;
+    IF (targetType = '일반회원') THEN
+        update members set member_login = null where member_id = targetID;
+        update users set user_type = null where user_id = targetID;
+        SET affected = 1;
+    ELSEIF (targetType = '창고관리자') THEN
+        update managers set manager_login = null where manager_id = targetID and manager_position = targetType;
+        update users set user_type = null where user_id = targetID;
+        SET affected = 1;
+    ELSE
+        SET affected = 0;
+    END IF;
 END $$
 DELIMITER ;

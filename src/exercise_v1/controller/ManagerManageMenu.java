@@ -12,6 +12,8 @@ import exercise_v1.exception.NotHavePermissionException;
 import exercise_v1.exception.NotRegisteredUserException;
 import exercise_v1.exception.NotUpdatedUserException;
 import exercise_v1.exception.UpdateException;
+import exercise_v1.exception.UserNotApprovedException;
+import exercise_v1.exception.UserNotRestoredException;
 import exercise_v1.model.ManagerDAO;
 import java.io.IOException;
 import java.util.Comparator;
@@ -164,15 +166,12 @@ public class ManagerManageMenu implements UserManageMenu {
                 String menuNum = input.readLine();
                 switch (menuNum) {
                     case "1" -> updateCurrentManager();
-                    case "2" -> updateUserRole();
-                    case "3" -> restoreUser();
-                    case "4" -> quitUpdate = quit();
+                    case "2" -> approveUser();
+                    case "3" -> updateUserRole();
+                    case "4" -> restoreUser();
+                    case "5" -> quitUpdate = quit();
                 }
-            } catch (NotAvailableUpdateChiefManagerException | NotUpdatedUserException e) {
-                System.out.println(e.getMessage());
-            } catch (NotHavePermissionException e) {
-                System.out.println(e.getMessage());
-            } catch (UpdateException e) {
+            } catch (NotUpdatedUserException | UpdateException | NotHavePermissionException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -210,6 +209,16 @@ public class ManagerManageMenu implements UserManageMenu {
         return newInfo;
     }
 
+    private void approveUser() throws IOException {
+        System.out.print(UserPage.INPUT_ID_FOR_APPROVE);
+        String targetID = input.readLine();
+        boolean ack = dao.approve(targetID, false);
+        if (!ack) {
+            throw new UserNotApprovedException(UserPage.APPROVE_FAILED.toString());
+        }
+        System.out.println(UserPage.APPROVE_COMPLETE);
+    }
+
     // 아무런 권한이 없는 회원에게 권한을 부여
     // 창고관리자는 일반회원 권한만 부여 가능
     public void updateUserRole() throws IOException {
@@ -237,8 +246,14 @@ public class ManagerManageMenu implements UserManageMenu {
         System.out.println(ack ? UserPage.ROLE_UPDATE_COMPLETE : UserPage.ROLE_UPDATE_FAILED);
     }
 
-    public void restoreUser() {
-
+    public void restoreUser() throws IOException {
+        System.out.print(UserPage.INPUT_ID_FOR_RESTORE);
+        String targetID = input.readLine();
+        boolean ack = dao.approve(targetID, true);
+        if (!ack) {
+            throw new UserNotRestoredException(UserPage.RESTORE_FAILED.toString());
+        }
+        System.out.println(UserPage.RESTORE_COMPLETE);
     }
 
     @Override
@@ -263,7 +278,9 @@ public class ManagerManageMenu implements UserManageMenu {
                         quitDelete = quit();
                         break;
                 }
-            } catch (NotAvailableDeleteChiefManagerException e) {
+            } catch (NotAvailableDeleteChiefManagerException
+                     | NotAvailableUpdateChiefManagerException
+                     | DeleteException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -290,26 +307,20 @@ public class ManagerManageMenu implements UserManageMenu {
     public void deleteUserRole() throws IOException {
         System.out.println(UserPage.INPUT_ID_FOR_DELETE_ROLE);
         String targetID = input.readLine();
-        String userType = dao.searchUserTypeBy(targetID);
-        if (userType == null) {
-            throw new UpdateException(UserPage.ALREADY_DELETED_ROLE.toString());
-        }
+        String targetType = dao.searchUserTypeBy(targetID);
 
-        System.out.println(UserPage.ROLE_DELETE_OPTION);
-        String option = input.readLine();
-        boolean ack = false;
-        switch (option) {
-            case "1":   // 일반회원 권한부여
-                ack = dao.deleteRole(targetID, "일반회원");
-                break;
-            case "2":   // 창고관리자 권한부여
-                if (!currentManager.getPosition().equals("총관리자")) {
-                    throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
-                }
-                ack = dao.deleteRole(targetID, "창고관리자");
-                break;
+        // 총관리자는 창고관리자, 일반회원 권한 삭제 가능, 창고관리자는 일반회원만 삭제 가능
+        if (targetType == null) {
+            throw new DeleteException(UserPage.ALREADY_DELETED_ROLE.toString());
         }
-        System.out.println(ack ? UserPage.ROLE_DELETE_OPTION : UserPage.ROLE_DELETE_FAILED);
+        if (targetType.equals("총관리자")) {
+            throw new NotAvailableUpdateChiefManagerException(UserPage.CHIEF_MANAGER_CANNOT_DELETE.toString());
+        }
+        if (!currentManager.getPosition().equals("총관리자") && targetType.equals("창고관리자")) {
+            throw new NotHavePermissionException(UserPage.NOT_HAVE_PERMISSION.toString());
+        }
+        boolean ack = dao.deleteRole(targetID, targetType);
+        System.out.println(ack ? UserPage.ROLE_DELETE_COMPLETE : UserPage.ROLE_DELETE_FAILED);
     }
 
     private boolean quit() {

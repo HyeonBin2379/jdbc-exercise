@@ -186,6 +186,25 @@ public class ManagerDAO implements UserDAO {
         return searchResult;
     }
 
+    public boolean approve(String targetID, boolean isRestore) {
+        String sql = isRestore
+                ? "{call restore_user(?, ?)}"
+                : "{call approve_user(?, ?)}";
+        try (Connection conn = DBUtil.getConnection();
+                CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, targetID);
+            call.registerOutParameter(2, Types.INTEGER);
+
+            call.execute();
+
+            int affected = call.getInt(2);
+            return affected == 1;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
     public boolean updateRole(String targetID, String newRole) {
         String sql = "{call update_role(?, ?, ?)}";
         try (Connection conn = DBUtil.getConnection();
@@ -200,11 +219,25 @@ public class ManagerDAO implements UserDAO {
             return affected == 1;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    public boolean deleteRole(String targetID, String newRole) {
+    public boolean deleteRole(String targetID, String targetType) {
+        String sql = "{call delete_role(?, ?, ?)}";
+        try (Connection conn = DBUtil.getConnection();
+                CallableStatement call = conn.prepareCall(sql)) {
+            call.setString(1, targetID);
+            call.setString(2, targetType);
+            call.registerOutParameter(3, Types.INTEGER);
+
+            call.execute();
+
+            int affected = call.getInt(3);
+            return affected == 1;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
         return false;
     }
 }
