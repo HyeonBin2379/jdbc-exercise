@@ -4,7 +4,9 @@ import exercise_v1.constant.user.LoginPage;
 import exercise_v1.constant.user.MemberPage;
 import exercise_v1.constant.user.UserPage;
 import exercise_v1.constant.user.validation.InputValidCheck;
+import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
+import exercise_v1.model.user.MemberDAO;
 import java.io.IOException;
 
 
