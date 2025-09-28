@@ -5,4 +5,5 @@ public class UserRoleNotDeletedException extends RuntimeException {
     public UserRoleNotDeletedException(String message) {
         super(message);
     }
+
 }

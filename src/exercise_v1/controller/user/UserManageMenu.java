@@ -1,7 +1,11 @@
 package exercise_v1.controller.user;
 
-import exercise_v1.constant.user.ManagerPage;
+
 import exercise_v1.constant.user.UserPage;
+import exercise_v1.constant.user.validation.UserManagementValidCheck;
+import exercise_v1.exception.user.UnableToReadUserException;
+import exercise_v1.exception.user.UserNotDeletedException;
+import exercise_v1.exception.user.UserNotUpdatedException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +13,7 @@ import java.io.InputStreamReader;
 public interface UserManageMenu {
 
     BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+    UserManagementValidCheck validCheck = new UserManagementValidCheck();
 
     default boolean run() {
         boolean quitMenu = false;
@@ -18,13 +23,17 @@ public interface UserManageMenu {
             try {
                 printMenu();
                 String menuNum = input.readLine();
+                validCheck.checkMenuNum("^[1-4]", menuNum);
                 switch (menuNum) {
                     case "1" -> read();
                     case "2" -> update();
                     case "3" -> hasLogout = delete();
                     case "4" -> quitMenu = exitMenu();
                 }
-            } catch (IOException e) {
+            } catch (IOException
+                     | UnableToReadUserException
+                     | UserNotUpdatedException
+                     | UserNotDeletedException e) {
                 System.out.println(e.getMessage());
             }
         }

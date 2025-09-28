@@ -1,6 +1,8 @@
 package exercise_v1.controller.user;
 
+
 import exercise_v1.constant.user.WMSPage;
+import exercise_v1.constant.user.validation.WMSValidCheck;
 import exercise_v1.domain.user.Manager;
 import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
@@ -9,11 +11,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+
 public class WMSMenu {
 
     private static final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
     private final User currentLoginUser;
+    private final WMSValidCheck validCheck;
 
     private boolean quitWMS;
     private UserManageMenu userManageMenu;
@@ -21,6 +25,7 @@ public class WMSMenu {
 
     public WMSMenu(User loginUser) {
         this.currentLoginUser = loginUser;
+        this.validCheck = new WMSValidCheck();
     }
 
     public void run() {
@@ -41,6 +46,7 @@ public class WMSMenu {
     public void memberMenuList(Member member) throws IOException {
         System.out.print(WMSPage.MEMBER_MENU_TITLE);
         String menuNum = input.readLine();
+        validCheck.checkMemberMenu(menuNum);
         switch (menuNum) {
             case "1":   // 회원관리
                 userManagement(member);
@@ -64,6 +70,7 @@ public class WMSMenu {
         // 창고관리 기능은 관리자 전용 기능이므로, memberMenu(), managerMenu()를 구분
         System.out.print(WMSPage.MANAGER_MENU_TITLE);
         String menuNum = input.readLine();
+        validCheck.checkManagerMenu(menuNum);
         switch (menuNum) {
             case "1":   // 회원관리
                 userManagement(manager);

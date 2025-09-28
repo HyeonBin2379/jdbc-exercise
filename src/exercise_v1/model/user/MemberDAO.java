@@ -1,8 +1,11 @@
 package exercise_v1.model.user;
 
 import exercise_v1.config.DBUtil;
+import exercise_v1.constant.user.UserPage;
 import exercise_v1.domain.user.Member;
 import exercise_v1.domain.user.User;
+import exercise_v1.exception.user.UserNotDeletedException;
+import exercise_v1.exception.user.UserNotUpdatedException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,9 +49,8 @@ public class MemberDAO implements UserDAO {
 
             return true;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new UserNotUpdatedException(UserPage.USER_UPDATE_FAILED.toString(), e);
         }
-        return false;
     }
 
     @Override
@@ -63,8 +65,7 @@ public class MemberDAO implements UserDAO {
             int affected = call.getInt(2);
             return affected > 0;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw new UserNotDeletedException(UserPage.USER_DELETE_FAILED.toString(), e);
         }
-        return false;
     }
 }
