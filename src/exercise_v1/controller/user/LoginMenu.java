@@ -1,7 +1,9 @@
 package exercise_v1.controller.user;
 
 import exercise_v1.constant.user.LoginPage;
+import exercise_v1.constant.user.validation.InputValidCheck;
 import exercise_v1.domain.user.User;
+import exercise_v1.exception.user.InvalidUserDataException;
 import exercise_v1.exception.user.UserIDNotFoundException;
 import exercise_v1.exception.user.LoginException;
 import exercise_v1.exception.user.UserNotRegisteredException;
@@ -20,9 +22,11 @@ public class LoginMenu {
     private static boolean quitLogin;
 
     private final LoginDAO dao;
+    private final InputValidCheck validCheck;
 
     private LoginMenu() {
         dao = new LoginDAO();
+        validCheck = new InputValidCheck();
     }
 
     // 컨트롤러에 싱글톤 패턴 적용
@@ -42,7 +46,7 @@ public class LoginMenu {
                     case "4" -> updatePassword();
                     case "5" -> exitLoginMenu();
                 }
-            } catch (IOException | LoginException e) {
+            } catch (IOException | LoginException | InvalidUserDataException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -62,7 +66,7 @@ public class LoginMenu {
         wmsMenu.run();
     }
 
-    public void register() throws IOException {
+    public void register() throws IOException, InvalidUserDataException {
         LoginPage.print(LoginPage.SIGN_UP);
         System.out.print(LoginPage.REGISTER_OR_NOT);
         String yesOrNo = input.readLine();
@@ -91,7 +95,7 @@ public class LoginMenu {
         System.out.println(LoginPage.REGISTER_SUCCESS);
     }
 
-    public User inputMemberInfo() throws IOException {
+    public User inputMemberInfo() throws IOException, InvalidUserDataException {
         LoginPage.print(LoginPage.MEMBER_REGISTER);
 
         System.out.println(LoginPage.INPUT_ID);
@@ -112,10 +116,11 @@ public class LoginMenu {
         User newUser = new User(userID, userPwd, companyName, phone, email, "일반회원");
         newUser.setCompanyCode(companyCode);
         newUser.setAddress(address);
+        validCheck.checkMemberData(newUser);
         return newUser;
     }
 
-    public User inputManagerInfo() throws IOException {
+    public User inputManagerInfo() throws IOException, InvalidUserDataException {
         LoginPage.print(LoginPage.MANAGER_REGISTER);
         System.out.println(LoginPage.INPUT_ID);
         String userID = input.readLine();
@@ -134,7 +139,9 @@ public class LoginMenu {
             case "1" -> position = "창고관리자";
             case "2" -> position = "총관리자";
         }
-        return new User(userID, userPwd, name, phone, email, position);
+        User newUser = new User(userID, userPwd, name, phone, email, position);
+        validCheck.checkManagerData(newUser);
+        return newUser;
     }
 
     public void findID() throws IOException {
